@@ -1,7 +1,7 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Turbo Torque 7492
 
-#include "turbolib/vision/TurboPhotonCamera.hpp"
+#include "turbolib/perception/TurboPhotonCamera.hpp"
 
 #include <optional>
 #include <string>
@@ -22,7 +22,7 @@
 #include "units/frequency.h"
 #include "units/time.h"
 
-using namespace turbolib::vision;
+using namespace turbolib::perception;
 
 TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName, const frc::Transform3d& cameraInBotSpace,
                                      frc::AprilTagField field)

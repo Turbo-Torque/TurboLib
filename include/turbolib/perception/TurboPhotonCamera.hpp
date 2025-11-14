@@ -19,7 +19,7 @@
 #include "photon/targeting/PhotonPipelineResult.h"
 #include "turbolib/structure/PoseTimestampPair.hpp"
 
-namespace turbolib::vision {
+namespace turbolib::perception {
 class TurboPhotonCamera {
  private:
   frc::AprilTagFieldLayout layout;
@@ -41,4 +41,4 @@ class TurboPhotonCamera {
   static int GetNumTargets(const photon::PhotonPipelineResult& result) { return result.GetTargets().size(); }
   bool SeesTag() const { return seesTag; }
 };
-}  // namespace turbolib::vision
+}  // namespace turbolib::perception
