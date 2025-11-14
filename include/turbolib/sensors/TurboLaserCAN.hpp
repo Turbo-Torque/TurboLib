@@ -7,19 +7,23 @@
 
 #include "grpl/LaserCan.h"
 
+namespace turbolib::sensors {
 class TurboLaserCAN {
   grpl::LaserCan laserCan;
 
- public:
+public:
   explicit TurboLaserCAN(const int id) : laserCan(id) {}
 
   [[nodiscard]]
   int GetProximity() const {
-    if (const std::optional<grpl::LaserCanMeasurement> measurement = laserCan.get_measurement();
-        measurement && measurement->status == grpl::LASERCAN_STATUS_VALID_MEASUREMENT) {
+    if (const std::optional<grpl::LaserCanMeasurement> measurement =
+            laserCan.get_measurement();
+        measurement &&
+        measurement->status == grpl::LASERCAN_STATUS_VALID_MEASUREMENT) {
       return measurement->distance_mm;
     }
 
     return 1000;
   }
 };
+} // namespace turbolib::sensors
