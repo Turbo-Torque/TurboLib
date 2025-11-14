@@ -9,7 +9,7 @@
 
 #include <string>
 
-#include "constants/Constants.h"
+#include "turbolib/constants/Constants.hpp"
 #include "ctre/phoenix6/StatusSignal.hpp"
 #include "ctre/phoenix6/core/CoreCANcoder.hpp"
 #include "frc/controller/PIDController.h"

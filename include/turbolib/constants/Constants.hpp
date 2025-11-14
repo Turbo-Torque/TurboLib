@@ -1,0 +1,84 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Turbo Torque 7492
+
+#pragma once
+
+#include <string>
+#include "frc/geometry/Transform3d.h"
+#include "frc/kinematics/SwerveDriveKinematics.h"
+
+namespace RobotConstants {
+inline constexpr int kNominalVoltage = 12;
+}  // namespace RobotConstants
+
+namespace OperatorConstants {
+
+inline constexpr int kDriverControllerPort = 0;
+inline constexpr int kOperatorControllerPort = 1;
+
+}  // namespace OperatorConstants
+
+namespace NeoKrakenModuleConstants {
+
+inline constexpr double kNominalVoltage = 12.8;
+
+}  // namespace NeoKrakenModuleConstants
+
+namespace CameraConstants {
+inline const std::string kPathToAprilTagLayout = "/home/lvuser/deploy/files/2025-reefscape-welded.json";
+
+inline const std::string kLocalizationCamOneName = "lc1";
+inline const std::string kLocalizationCamTwoName = "lc2";
+
+inline constexpr frc::Transform3d kLocalizationCamOneOffset{frc::Translation3d(-0.0952_m, 0.2921_m, 0.1_m),
+                                                            frc::Rotation3d(0.0_rad, 0.0_rad, 0.0_rad)};
+
+inline const frc::Transform3d kLocalizationCamTwoOffset{
+    frc::Translation3d(0.2159_m, -0.279_m, 0.1143_m),
+    frc::Rotation3d(0_rad, units::radian_t{units::degree_t{20}}, units::radian_t{units::degree_t{37}})};
+}  // namespace CameraConstants
+
+namespace DriveSubsystemConstants {
+inline constexpr int kPigeonID = 10;
+inline const std::string kCanivoreName = "CANIVORE";
+
+inline constexpr double kFrontLeftDriveID = 1;
+inline constexpr double kFrontLeftSteerID = 2;
+inline constexpr double kFrontLeftEncoderID = 50;
+
+inline constexpr double kFrontRightDriveID = 3;
+inline constexpr double kFrontRightSteerID = 4;
+inline constexpr double kFrontRightEncoderID = 51;
+
+inline constexpr double kBackLeftDriveID = 5;
+inline constexpr double kBackLeftSteerID = 6;
+inline constexpr double kBackLeftEncoderID = 52;
+
+inline constexpr double kBackRightDriveID = 7;
+inline constexpr double kBackRightSteerID = 8;
+inline constexpr double kBackRightEncoderID = 53;
+
+inline constexpr double kFrontLeftOffset = 1.919009965644937 + M_PI;
+inline constexpr double kFrontRightOffset = 2.049398332615217;
+inline constexpr double kBackLeftOffset = -0.578310757032887 + M_PI;
+inline constexpr double kBackRightOffset = -2.581689666011534 + M_PI;
+
+inline constexpr double kRobotLength = .5525;
+inline constexpr double kRobotWidth = .5525;
+
+inline constexpr units::meters_per_second_t kMaxLinearSpeed = 2.5_mps;
+inline constexpr units::radians_per_second_t kMaxAngularSpeed = 570_deg_per_s;
+
+inline constexpr units::meters_per_second_t kProcessorMaxLinearSpeed = 2.5_mps;
+inline constexpr units::radians_per_second_t kProcessorMaxAngularSpeed = 360_deg_per_s;
+
+inline constexpr frc::Translation2d kModulePositions[] = {
+    {units::meter_t{kRobotLength / 2}, units::meter_t{kRobotWidth / 2}},   // Front Left
+    {units::meter_t{kRobotLength / 2}, units::meter_t{-kRobotWidth / 2}},  // Front Right
+    {units::meter_t{-kRobotLength / 2}, units::meter_t{kRobotWidth / 2}},  // Back Left
+    {units::meter_t{-kRobotLength / 2}, units::meter_t{-kRobotWidth / 2}}  // Back Right
+};
+
+inline frc::SwerveDriveKinematics<4> kKinematics{kModulePositions[0], kModulePositions[1], kModulePositions[2],
+                                                 kModulePositions[3]};
+}  // namespace DriveSubsystemConstants
