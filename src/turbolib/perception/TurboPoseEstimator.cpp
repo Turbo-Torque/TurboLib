@@ -3,6 +3,8 @@
 
 #include "turbolib/perception/TurboPoseEstimator.hpp"
 
+#include <vector>
+
 #include "frc/RobotBase.h"
 #include "frc/geometry/Pose2d.h"
 #include "turbolib/structure/PoseTimestampPair.hpp"

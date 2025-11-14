@@ -9,7 +9,6 @@
 
 #include <string>
 
-#include "turbolib/constants/Constants.hpp"
 #include "ctre/phoenix6/StatusSignal.hpp"
 #include "ctre/phoenix6/core/CoreCANcoder.hpp"
 #include "frc/controller/PIDController.h"
@@ -18,6 +17,7 @@
 #include "rev/SparkBase.h"
 #include "rev/SparkMax.h"
 #include "rev/config/SparkBaseConfig.h"
+#include "turbolib/constants/Constants.hpp"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/base.h"
