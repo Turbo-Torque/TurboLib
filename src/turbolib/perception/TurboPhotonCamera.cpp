@@ -39,9 +39,12 @@ TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName, const frc::T
 
     systemSim.emplace("main");
     cameraSim.emplace(photon::PhotonCameraSim(&camera, cameraProp));
+
+    cameraSim->EnableRawStream(true);
+    cameraSim->EnabledProcessedStream(true);
     cameraSim->EnableDrawWireframe(true);
 
-    systemSim->AddAprilTags(GetLayout());
+    systemSim->AddAprilTags(layout);
     systemSim->AddCamera(&cameraSim.value(), cameraInBotSpace);
 
     frc::SmartDashboard::PutData("Sim Field", &systemSim->GetDebugField());
@@ -55,12 +58,6 @@ void TurboPhotonCamera::UpdateSim(const frc::Pose2d& robotPose) {
   if constexpr (frc::RobotBase::IsSimulation()) {
     systemSim->Update(robotPose);
   }
-}
-
-const frc::AprilTagFieldLayout& TurboPhotonCamera::GetLayout() {
-  layout = frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2025ReefscapeAndyMark);
-
-  return layout;
 }
 
 std::vector<turbolib::structure::PoseTimestampPair> TurboPhotonCamera::FetchPose() {
