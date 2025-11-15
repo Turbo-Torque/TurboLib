@@ -28,6 +28,7 @@ class TurboPhotonCamera {
 
   std::optional<photon::VisionSystemSim> systemSim = std::nullopt;
   std::optional<photon::PhotonCameraSim> cameraSim = std::nullopt;
+  std::optional<photon::PhotonPipelineResult> lastResult;
 
   nt::StructArrayPublisher<frc::Pose2d> visionTargetPublisher;
 
@@ -38,6 +39,7 @@ class TurboPhotonCamera {
   void UpdateSim(const frc::Pose2d& robotPose);
   const frc::AprilTagFieldLayout& GetLayout();
   std::vector<turbolib::structure::PoseTimestampPair> FetchPose();
+  std::optional<photon::PhotonPipelineResult> GetLastResult() const { return lastResult; }
   static int GetNumTargets(const photon::PhotonPipelineResult& result) { return result.GetTargets().size(); }
   bool SeesTag() const { return seesTag; }
 };

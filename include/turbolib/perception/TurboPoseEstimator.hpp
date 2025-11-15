@@ -4,6 +4,7 @@
 #pragma once
 
 #include <array>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -41,6 +42,10 @@ class TurboPoseEstimator {
   void AddLocalizationCamera(const std::string& cameraName, const frc::Transform3d& cameraInBotSpace,
                              frc::AprilTagField field) {
     localizationCameras.emplace_back(cameraName, cameraInBotSpace, field);
+  }
+
+  std::optional<photon::PhotonPipelineResult> GetLastVisionResult(int cameraIdx) const {
+    return localizationCameras[cameraIdx].GetLastResult().value();
   }
 
   bool SeesTag() const;

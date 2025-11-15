@@ -67,6 +67,7 @@ std::vector<turbolib::structure::PoseTimestampPair> TurboPhotonCamera::FetchPose
   std::vector<turbolib::structure::PoseTimestampPair> poses;
 
   for (const auto& result : camera.GetAllUnreadResults()) {
+    lastResult = result;
     if (auto visionEst = poseEstimator.Update(result)) {
       poses.emplace_back(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp);
     }
