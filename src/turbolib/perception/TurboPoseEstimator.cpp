@@ -3,6 +3,7 @@
 
 #include "turbolib/perception/TurboPoseEstimator.hpp"
 
+#include <cassert>
 #include <vector>
 
 #include "frc/RobotBase.h"
@@ -41,6 +42,8 @@ void TurboPoseEstimator::TryVisionUpdateWithCamera(turbolib::perception::TurboPh
 }
 
 void TurboPoseEstimator::UpdateWithAllAvailableVisionMeasurements() {
+  assert(!localizationCameras.empty() && "No localization cameras have been added to the pose estimator!");
+
   for (auto& camera : localizationCameras) {
     TryVisionUpdateWithCamera(camera);
   }

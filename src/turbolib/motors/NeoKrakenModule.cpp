@@ -17,7 +17,6 @@
 #include "rev/SparkBase.h"
 #include "rev/SparkMax.h"
 #include "rev/config/SparkBaseConfig.h"
-#include "turbolib/constants/Constants.hpp"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/base.h"
@@ -70,7 +69,7 @@ void NeoKrakenModule::ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX& target
 void NeoKrakenModule::ConfigSteerMotor(rev::spark::SparkMax& target) {
   rev::spark::SparkBaseConfig config;
   config.Inverted(false);
-  config.VoltageCompensation(NeoKrakenModuleConstants::kNominalVoltage);
+  config.VoltageCompensation(12.8);  // it looks like a magic number buts its just the number of volts
   config.SetIdleMode(rev::spark::SparkBaseConfig::kBrake);
   config.SmartCurrentLimit(80);
   target.Configure(config, rev::spark::SparkBase::ResetMode::kNoResetSafeParameters,
