@@ -45,7 +45,11 @@ class TurboPoseEstimator {
   }
 
   std::optional<photon::PhotonPipelineResult> GetLastVisionResult(int cameraIdx) const {
-    return localizationCameras[cameraIdx].GetLastResult().value();
+    if (cameraIdx < 0 || static_cast<size_t>(cameraIdx) >= localizationCameras.size()) {
+      return std::nullopt;
+    }
+
+    return localizationCameras[cameraIdx].GetLastResult();
   }
 
   bool SeesTag() const;

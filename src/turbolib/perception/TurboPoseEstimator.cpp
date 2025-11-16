@@ -32,8 +32,6 @@ void TurboPoseEstimator::TryVisionUpdateWithCamera(turbolib::perception::TurboPh
   if constexpr (frc::RobotBase::IsSimulation()) {
     const frc::Pose2d pose = simPoseTopic.Get(frc::Pose2d());
     camera.UpdateSim(pose);
-
-    return;
   }
 
   const std::vector<turbolib::structure::PoseTimestampPair> visionPoses = camera.FetchPose();
@@ -44,8 +42,6 @@ void TurboPoseEstimator::TryVisionUpdateWithCamera(turbolib::perception::TurboPh
 }
 
 void TurboPoseEstimator::UpdateWithAllAvailableVisionMeasurements() {
-  assert(!localizationCameras.empty() && "No localization cameras have been added to the pose estimator!");
-
   for (auto& camera : localizationCameras) {
     TryVisionUpdateWithCamera(camera);
   }
