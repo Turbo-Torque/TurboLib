@@ -12,8 +12,12 @@
 
 using namespace turbolib::perception;
 
-frc::Pose2d TurboPoseEstimator::GetPose2D() const {
-  return poseEstimator.GetEstimatedPosition();
+frc::Pose2d TurboPoseEstimator::GetPose2D() {
+  auto pose = poseEstimator.GetEstimatedPosition();
+
+  visionPosePublisher.Set(pose);
+
+  return pose;
 }
 
 void TurboPoseEstimator::ResetEstimatorPosition(const frc::Rotation2d& gyroAngle,

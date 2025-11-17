@@ -25,13 +25,16 @@ class TurboPoseEstimator {
 
   nt::StructSubscriber<frc::Pose2d> simPoseTopic =
       nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("Pose").Subscribe(frc::Pose2d{});
+  nt::StructPublisher<frc::Pose2d> visionPosePublisher;
 
  public:
   TurboPoseEstimator(const frc::Rotation2d& gyroAngle, const std::array<frc::SwerveModulePosition, 4>& modulePositions,
                      const frc::Pose2d& initialPose, frc::SwerveDriveKinematics<4> kinematics)
-      : poseEstimator(kinematics, gyroAngle, modulePositions, initialPose) {}
+      : poseEstimator(kinematics, gyroAngle, modulePositions, initialPose) {
+    visionPosePublisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("VisionPose").Publish();
+  }
 
-  frc::Pose2d GetPose2D() const;
+  frc::Pose2d GetPose2D();
   void ResetEstimatorPosition(const frc::Rotation2d& gyroAngle,
                               const std::array<frc::SwerveModulePosition, 4>& modulePositions, const frc::Pose2d& pose);
   void UpdateWithOdometryAndVision(const frc::Rotation2d& gyroAngle,
