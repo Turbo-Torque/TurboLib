@@ -30,7 +30,7 @@ class NeoKrakenModule final : public wpi::Sendable {
   double setpoint{};
 
   frc::SimpleMotorFeedforward<units::meters> ff;
-  frc::PIDController driveController, steerController;
+  frc::PIDController driveController;
 
   constexpr static double kVelocityMultiplier =
       (1 / 6.75 / 60) * (.1016 * M_PI);

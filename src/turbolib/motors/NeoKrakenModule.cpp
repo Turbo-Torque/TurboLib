@@ -33,8 +33,7 @@ NeoKrakenModule::NeoKrakenModule(const int driveID, const int steerID,
     : canBus(can), driveMotor(driveID, canBus),
       encoderObject(encoderID, canBus),
       steerMotor(steerID, rev::spark::SparkLowLevel::MotorType::kBrushless),
-      ff(0_V, 0_V / 1_mps), driveController(0.0, 0.0, 0.0),
-      steerController(0.0, 0.0, 0.0) {
+      ff(0_V, 0_V / 1_mps), driveController(0.0, 0.0, 0.0) {
 
   SetupEncoder(encoderObject);
   ConfigDriveMotor(driveMotor);
@@ -53,13 +52,11 @@ void NeoKrakenModule::SetupEncoder(
 }
 
 void NeoKrakenModule::ConfigPIDInternal() {
-  this->ff =
-      frc::SimpleMotorFeedforward<units::meters>{0.015_V, 0.212_V / 1_mps};
+  this->ff = frc::SimpleMotorFeedforward<units::meters>{
+      0.015_V, 0.212_V / 1_mps}; // TODO: SYSID tune
 
-  this->driveController = frc::PIDController(0.01, 0.0, 0.0);
-  this->steerController = frc::PIDController(0.3, 0.0, 0.0);
-
-  this->steerController.EnableContinuousInput(-M_PI, M_PI);
+  this->driveController =
+      frc::PIDController(0.001, 0.0, 0.0); // TODO: Significantly reduce P
 }
 
 void NeoKrakenModule::ConfigDriveMotor(
@@ -80,6 +77,9 @@ void NeoKrakenModule::ConfigSteerMotor(rev::spark::SparkMax &target) {
       12.8); // it looks like a magic number buts its just the number of volts
   config.SetIdleMode(rev::spark::SparkBaseConfig::kBrake);
   config.SmartCurrentLimit(80);
+  config.closedLoop.P(0.3);
+  config.closedLoop.I(0.0);
+  config.closedLoop.D(0.0);
   target.Configure(config, rev::ResetMode::kNoResetSafeParameters,
                    rev::PersistMode::kPersistParameters);
 }
@@ -103,13 +103,18 @@ void NeoKrakenModule::SetModuleState(frc::SwerveModuleState state) {
   const units::radian_t angle = state.angle.Radians();
   setpoint = angle.value();
 
-  const double drivePercent =
-      driveController.Calculate(GetVelocity().value(), speed.value());
-  const double steerPercent =
-      steerController.Calculate(currentMeasurement, angle.value());
+  units::volt_t output =
+      ff.Calculate(speed) + units::volt_t{driveController.Calculate(
+                                GetVelocity().value(), speed.value())};
 
-  driveMotor.Set(drivePercent + ff.Calculate(speed).value());
-  steerMotor.Set(-steerPercent);
+  output = std::clamp(output, -12_V, 12_V);
+
+  driveMotor.SetVoltage(output);
+
+  rev::spark::SparkClosedLoopController &steerCLController =
+      steerMotor.GetClosedLoopController();
+  steerCLController.SetSetpoint(
+      angle.value(), rev::spark::SparkLowLevel::ControlType::kPosition);
 }
 
 void NeoKrakenModule::InitSendable(wpi::SendableBuilder &builder) {
