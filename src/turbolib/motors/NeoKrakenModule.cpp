@@ -4,6 +4,7 @@
 #include "turbolib/motors/NeoKrakenModule.hpp"
 
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <cmath>
 #include <optional>
 #include <units/velocity.h>
 #include <units/voltage.h>
@@ -47,6 +48,8 @@ NeoKrakenModule::NeoKrakenModule(const int driveID, const int steerID, const int
 void NeoKrakenModule::SetupEncoder(ctre::phoenix6::hardware::CANcoder& encoder) {
   ctre::phoenix6::configs::CANcoderConfigurator& configPls = encoder.GetConfigurator();
   ctre::phoenix6::configs::CANcoderConfiguration config{};
+  configPls.Refresh(config);
+
   config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = units::turn_t{0.5};
 
   configPls.Apply(config);
@@ -63,6 +66,7 @@ void NeoKrakenModule::ConfigPIDInternal() {
 
 void NeoKrakenModule::ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX& target) {
   ctre::phoenix6::configs::TalonFXConfiguration config{};
+  target.GetConfigurator().Refresh(config);
   config.MotorOutput.NeutralMode = ctre::phoenix6::signals::NeutralModeValue::Brake;
 
   CurrentLimitsDrive(config);
