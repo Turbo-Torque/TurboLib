@@ -5,6 +5,7 @@
 
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
+#include <optional>
 #include <rev/SparkMax.h>
 
 #include <string>
@@ -23,14 +24,14 @@ namespace turbolib::motors {
 class NeoKrakenModule final : public wpi::Sendable {
   ctre::phoenix6::CANBus canBus;
   ctre::phoenix6::hardware::TalonFX driveMotor;
-  ctre::phoenix6::hardware::CANcoder encoderObject;
   rev::spark::SparkMax steerMotor;
+  ctre::phoenix6::hardware::CANcoder encoderObject;
 
   double offset;
   double setpoint{};
 
   frc::SimpleMotorFeedforward<units::meters> ff;
-  frc::PIDController driveController;
+  frc::PIDController driveController, steerController;
 
   constexpr static double kVelocityMultiplier =
       (1 / 6.75 / 60) * (.1016 * M_PI);
@@ -39,7 +40,7 @@ class NeoKrakenModule final : public wpi::Sendable {
 
 public:
   NeoKrakenModule(int driveID, int steerID, int encoderID, double offset,
-                  const std::string &can);
+                  const std::optional<std::string> &can);
 
   void ConfigPIDInternal();
   static void ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX &target);
