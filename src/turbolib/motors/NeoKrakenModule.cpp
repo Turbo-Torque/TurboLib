@@ -56,10 +56,12 @@ void NeoKrakenModule::SetupEncoder(ctre::phoenix6::hardware::CANcoder& encoder) 
 }
 
 void NeoKrakenModule::ConfigPIDInternal() {
-  this->ff = frc::SimpleMotorFeedforward<units::meters>{0.015_V, 0.212_V / 1_mps};  // TODO: Tune with SYSID
+  // TODO: Tune when we get a robot
+  this->ff = frc::SimpleMotorFeedforward<units::meters>{0.0_V, 0.0_V / 1_mps, 0.0_V * 1_s / 1_mps};
 
-  this->driveController = frc::PIDController(0.01, 0.0, 0.0);  // TODO: Reduce p when tuning sysid
-  this->steerController = frc::PIDController(0.3, 0.0, 0.0);   // TODO: Remove this use the neos onboard PID
+  // ! Make sure to tune when we get a robot
+  this->driveController = frc::PIDController(0.00, 0.0, 0.0);
+  this->steerController = frc::PIDController(0.3, 0.0, 0.0);
 
   this->steerController.EnableContinuousInput(-M_PI, M_PI);
 }
@@ -101,17 +103,17 @@ void NeoKrakenModule::SetModuleState(frc::SwerveModuleState state) {
   const units::radian_t angle = state.angle.Radians();
   setpoint = angle.value();
 
-  // TODO: PLEASE fix this this is completely wrong
-  const double drivePercent = driveController.Calculate(GetVelocity().value(), speed.value());
+  units::volt_t output =
+      ff.Calculate(speed) + units::volt_t{driveController.Calculate(GetVelocity().value(), speed.value())};
   const double steerPercent = steerController.Calculate(currentMeasurement, angle.value());
 
-  driveMotor.Set(drivePercent + ff.Calculate(speed).value());
+  driveMotor.SetVoltage(output);
   steerMotor.Set(-steerPercent);
 }
 
 void NeoKrakenModule::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("SwerveModule");
-  builder.AddDoubleProperty("Drive Velocity (m/s)", [this]() { return GetVelocity().value(); }, nullptr);
+  builder.AddDoubleProperty("Drive Velocity (ms)", [this]() { return GetVelocity().value(); }, nullptr);
   builder.AddDoubleProperty("Drive Position (m)", [this]() { return GetPosition(); }, nullptr);
   builder.AddDoubleProperty("Steer Angle (rad)", [this]() { return GetEncoderPosition(); }, nullptr);
   builder.AddDoubleProperty("Steer Setpoint (rad)", [this]() { return setpoint; }, nullptr);
