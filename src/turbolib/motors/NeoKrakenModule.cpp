@@ -3,8 +3,8 @@
 
 #include "turbolib/motors/NeoKrakenModule.hpp"
 
-#include <frc/smartdashboard/SmartDashboard.h>
 #include <cmath>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <optional>
 #include <units/velocity.h>
 #include <units/voltage.h>
@@ -19,11 +19,13 @@
 #include "frc/geometry/Rotation2d.h"
 #include "rev/ConfigureTypes.h"
 #include "rev/SparkBase.h"
+#include "rev/SparkLowLevel.h"
 #include "rev/SparkMax.h"
 #include "rev/config/SparkBaseConfig.h"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/base.h"
+#include "units/current.h"
 #include "units/length.h"
 #include "wpi/sendable/SendableBuilder.h"
 
@@ -32,9 +34,9 @@ using namespace turbolib::motors;
 NeoKrakenModule::NeoKrakenModule(const int driveID, const int steerID, const int encoderID, const double offset,
                                  const std::optional<std::string>& can)
     : canBus(can.has_value() ? can.value() : ""),
-      driveMotor(driveID),
+      driveMotor(driveID, canBus),
       steerMotor(steerID, rev::spark::SparkLowLevel::MotorType::kBrushless),
-      encoderObject(encoderID),
+      encoderObject(encoderID, canBus),
       offset(offset),
       ff(0_V, 0_V / 1_mps),
       driveController(0.0, 0.0, 0.0),
@@ -56,11 +58,9 @@ void NeoKrakenModule::SetupEncoder(ctre::phoenix6::hardware::CANcoder& encoder) 
 }
 
 void NeoKrakenModule::ConfigPIDInternal() {
-  // TODO: Tune when we get a robot
-  this->ff = frc::SimpleMotorFeedforward<units::meters>{0.0_V, 0.0_V / 1_mps, 0.0_V * 1_s / 1_mps};
+  this->ff = frc::SimpleMotorFeedforward<units::meters>{0.2_V, 2.0_V / 1_mps};
 
-  // ! Make sure to tune when we get a robot
-  this->driveController = frc::PIDController(0.00, 0.0, 0.0);
+  this->driveController = frc::PIDController(0.01, 0.0, 0.0);
   this->steerController = frc::PIDController(0.3, 0.0, 0.0);
 
   this->steerController.EnableContinuousInput(-M_PI, M_PI);
