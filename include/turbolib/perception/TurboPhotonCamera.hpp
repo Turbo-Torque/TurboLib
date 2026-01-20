@@ -10,7 +10,6 @@
 #include "frc/apriltag/AprilTagFieldLayout.h"
 #include "frc/apriltag/AprilTagFields.h"
 #include "frc/geometry/Pose2d.h"
-#include "networktables/StructArrayTopic.h"
 #include "photon/PhotonCamera.h"
 #include "photon/PhotonPoseEstimator.h"
 #include "photon/simulation/PhotonCameraSim.h"
@@ -27,9 +26,7 @@ class TurboPhotonCamera {
 
   std::optional<photon::VisionSystemSim> systemSim = std::nullopt;
   std::optional<photon::PhotonCameraSim> cameraSim = std::nullopt;
-  std::optional<photon::PhotonPipelineResult> lastResult;
-
-  nt::StructArrayPublisher<frc::Pose2d> visionTargetPublisher;
+  std::optional<photon::PhotonPipelineResult> lastResult = std::nullopt;
 
   bool seesTag = false;
 

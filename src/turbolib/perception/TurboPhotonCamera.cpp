@@ -13,7 +13,6 @@
 #include "frc/apriltag/AprilTagFields.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/smartdashboard/SmartDashboard.h"
-#include "networktables/NetworkTableInstance.h"
 #include "photon/PhotonCamera.h"
 #include "photon/PhotonPoseEstimator.h"
 #include "photon/simulation/PhotonCameraSim.h"
@@ -49,9 +48,6 @@ TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName, const frc::T
 
     frc::SmartDashboard::PutData("Sim Field", &systemSim->GetDebugField());
   }
-
-  visionTargetPublisher =
-      nt::NetworkTableInstance::GetDefault().GetStructArrayTopic<frc::Pose2d>(cameraName + "/targets").Publish();
 }
 
 void TurboPhotonCamera::UpdateSim(const frc::Pose2d& robotPose) {

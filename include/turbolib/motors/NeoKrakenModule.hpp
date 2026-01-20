@@ -17,10 +17,11 @@
 #include "frc/kinematics/SwerveModuleState.h"
 #include "units/length.h"
 #include "units/velocity.h"
-#include "wpi/sendable/Sendable.h"
 
 namespace turbolib::motors {
-class NeoKrakenModule final : public wpi::Sendable {
+class NeoKrakenModule final {
+  std::string name;
+
   ctre::phoenix6::CANBus canBus;
   ctre::phoenix6::hardware::TalonFX driveMotor;
   rev::spark::SparkMax steerMotor;
@@ -37,7 +38,8 @@ class NeoKrakenModule final : public wpi::Sendable {
   constexpr static double kCanCoderMultiplier = 2 * M_PI;
 
  public:
-  NeoKrakenModule(int driveID, int steerID, int encoderID, double offset, const std::string& can = "");
+  NeoKrakenModule(const std::string& name, int driveID, int steerID, int encoderID, double offset,
+                  const std::string& can = "");
 
   void ConfigPIDInternal();
   static void ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX& target);
@@ -51,6 +53,6 @@ class NeoKrakenModule final : public wpi::Sendable {
   frc::SwerveModulePosition GetModulePosition();
   units::meters_per_second_t GetVelocity();
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void UpdateTelemetry();
 };
 }  // namespace turbolib::motors

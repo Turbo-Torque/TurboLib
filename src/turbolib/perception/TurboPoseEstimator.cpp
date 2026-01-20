@@ -6,7 +6,6 @@
 #include <cassert>
 #include <vector>
 
-#include "frc/RobotBase.h"
 #include "frc/geometry/Pose2d.h"
 #include "turbolib/structure/PoseTimestampPair.hpp"
 
@@ -14,8 +13,6 @@ using namespace turbolib::perception;
 
 frc::Pose2d TurboPoseEstimator::GetPose2D() {
   auto pose = poseEstimator.GetEstimatedPosition();
-
-  visionPosePublisher.Set(pose);
 
   return pose;
 }
@@ -33,11 +30,6 @@ void TurboPoseEstimator::UpdateWithOdometryAndVision(const frc::Rotation2d& gyro
 }
 
 void TurboPoseEstimator::TryVisionUpdateWithCamera(turbolib::perception::TurboPhotonCamera& camera) {
-  if constexpr (frc::RobotBase::IsSimulation()) {
-    const frc::Pose2d pose = simPoseTopic.Get(frc::Pose2d());
-    camera.UpdateSim(pose);
-  }
-
   const std::vector<turbolib::structure::PoseTimestampPair> visionPoses = camera.FetchPose();
 
   for (const auto& pair : visionPoses) {

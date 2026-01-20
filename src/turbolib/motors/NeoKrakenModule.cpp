@@ -13,6 +13,7 @@
 #include "ctre/phoenix6/CANBus.hpp"
 #include "ctre/phoenix6/StatusSignal.hpp"
 #include "ctre/phoenix6/core/CoreCANcoder.hpp"
+#include "fmt/format.h"
 #include "frc/controller/PIDController.h"
 #include "frc/controller/SimpleMotorFeedforward.h"
 #include "frc/geometry/Rotation2d.h"
@@ -21,18 +22,19 @@
 #include "rev/SparkLowLevel.h"
 #include "rev/SparkMax.h"
 #include "rev/config/SparkBaseConfig.h"
+#include "telemetrykit/core/Logger.h"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/base.h"
 #include "units/current.h"
 #include "units/length.h"
-#include "wpi/sendable/SendableBuilder.h"
 
 using namespace turbolib::motors;
 
-NeoKrakenModule::NeoKrakenModule(const int driveID, const int steerID, const int encoderID, const double offset,
-                                 const std::string& can)
-    : canBus(can),
+NeoKrakenModule::NeoKrakenModule(const std::string& name, const int driveID, const int steerID, const int encoderID,
+                                 const double offset, const std::string& can)
+    : name(name),
+      canBus(can),
       driveMotor(driveID, canBus),
       steerMotor(steerID, rev::spark::SparkLowLevel::MotorType::kBrushless),
       encoderObject(encoderID, canBus),
@@ -110,12 +112,11 @@ void NeoKrakenModule::SetModuleState(frc::SwerveModuleState state) {
   steerMotor.Set(-steerPercent);
 }
 
-void NeoKrakenModule::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("SwerveModule");
-  builder.AddDoubleProperty("Drive Velocity (ms)", [this]() { return GetVelocity().value(); }, nullptr);
-  builder.AddDoubleProperty("Drive Position (m)", [this]() { return GetPosition(); }, nullptr);
-  builder.AddDoubleProperty("Steer Angle (rad)", [this]() { return GetEncoderPosition(); }, nullptr);
-  builder.AddDoubleProperty("Steer Setpoint (rad)", [this]() { return setpoint; }, nullptr);
+void NeoKrakenModule::UpdateTelemetry() {
+  tkit::RecordOutput(fmt::format("DriveSubsystem/{}/DriveVelocity", name), GetVelocity().value());
+  tkit::RecordOutput(fmt::format("DriveSubsystem/{}/DrivePosition", name), GetPosition());
+  tkit::RecordOutput(fmt::format("DriveSubsystem/{}/SteerAngle", name), GetEncoderPosition());
+  tkit::RecordOutput(fmt::format("DriveSubsystem/{}/SteerSetpoint", name), setpoint);
 }
 
 double NeoKrakenModule::GetEncoderPosition() {
