@@ -5,7 +5,6 @@
 
 #include <cmath>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <optional>
 #include <units/velocity.h>
 #include <units/voltage.h>
 
@@ -32,8 +31,8 @@
 using namespace turbolib::motors;
 
 NeoKrakenModule::NeoKrakenModule(const int driveID, const int steerID, const int encoderID, const double offset,
-                                 const std::optional<std::string>& can)
-    : canBus(can.has_value() ? can.value() : ""),
+                                 const std::string& can)
+    : canBus(can),
       driveMotor(driveID, canBus),
       steerMotor(steerID, rev::spark::SparkLowLevel::MotorType::kBrushless),
       encoderObject(encoderID, canBus),
@@ -107,7 +106,7 @@ void NeoKrakenModule::SetModuleState(frc::SwerveModuleState state) {
       ff.Calculate(speed) + units::volt_t{driveController.Calculate(GetVelocity().value(), speed.value())};
   const double steerPercent = steerController.Calculate(currentMeasurement, angle.value());
 
-  driveMotor.SetVoltage(output);
+  driveMotor.SetVoltage(output);  // TODO: TUR-11 replace with SetControl
   steerMotor.Set(-steerPercent);
 }
 

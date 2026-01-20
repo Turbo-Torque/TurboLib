@@ -5,7 +5,6 @@
 
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
-#include <optional>
 #include <rev/SparkMax.h>
 
 #include <string>
@@ -38,7 +37,7 @@ class NeoKrakenModule final : public wpi::Sendable {
   constexpr static double kCanCoderMultiplier = 2 * M_PI;
 
  public:
-  NeoKrakenModule(int driveID, int steerID, int encoderID, double offset, const std::optional<std::string>& can);
+  NeoKrakenModule(int driveID, int steerID, int encoderID, double offset, const std::string& can = "");
 
   void ConfigPIDInternal();
   static void ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX& target);
