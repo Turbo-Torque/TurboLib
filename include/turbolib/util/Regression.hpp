@@ -6,6 +6,8 @@
 #include "Eigen/Core"
 #include "Eigen/Dense"
 
+namespace turbolib::util {
+
 inline auto PerformRegression(const std::vector<double>& x, const std::vector<double>& y, unsigned int degree = 1) {
   if (x.empty() || y.empty()) {
     throw std::invalid_argument("Input vectors must not be empty");
@@ -44,3 +46,4 @@ inline auto PerformRegression(const std::vector<double>& x, const std::vector<do
     return result;
   };
 }
+}  // namespace turbolib::util
