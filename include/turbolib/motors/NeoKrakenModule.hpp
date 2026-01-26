@@ -18,6 +18,9 @@
 #include "units/length.h"
 #include "units/velocity.h"
 
+inline constexpr double GEAR_RATIO = 6.75;
+inline constexpr units::inch_t WHEEL_DIAMETER = 4_in;
+
 namespace turbolib::motors {
 class NeoKrakenModule final {
   std::string name;
@@ -33,8 +36,8 @@ class NeoKrakenModule final {
   frc::SimpleMotorFeedforward<units::meters> ff;
   frc::PIDController driveController, steerController;
 
-  constexpr static double kVelocityMultiplier = (1 / 6.75 / 60) * (.1016 * M_PI);
-  constexpr static double kPositionMultiplier = (1 / 6.75) * (.1016 * M_PI);
+  constexpr static double kVelocityMultiplier = (1 / GEAR_RATIO / 60) * (units::meter_t{WHEEL_DIAMETER}.value() * M_PI);
+  constexpr static double kPositionMultiplier = (1 / GEAR_RATIO) * (units::meter_t{WHEEL_DIAMETER}.value() * M_PI);
   constexpr static double kCanCoderMultiplier = 2 * M_PI;
 
  public:
