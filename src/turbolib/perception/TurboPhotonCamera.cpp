@@ -17,6 +17,7 @@
 #include "photon/PhotonPoseEstimator.h"
 #include "photon/simulation/PhotonCameraSim.h"
 #include "photon/simulation/SimCameraProperties.h"
+#include "telemetrykit/core/Logger.h"
 #include "turbolib/structure/PoseTimestampPair.hpp"
 #include "units/frequency.h"
 #include "units/time.h"
@@ -68,6 +69,8 @@ std::vector<turbolib::structure::PoseTimestampPair> TurboPhotonCamera::FetchPose
     seesTag = false;
   } else {
     seesTag = true;
+
+    tkit::RecordOutput("DriveSubsystem/VisionPose", tkit::MakeStructValue(poses.front().getPose()));
   }
 
   return poses;
