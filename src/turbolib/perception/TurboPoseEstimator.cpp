@@ -7,14 +7,13 @@
 #include <vector>
 
 #include "frc/geometry/Pose2d.h"
+#include "telemetrykit/core/AlertManager.h"
 #include "turbolib/structure/PoseTimestampPair.hpp"
 
 using namespace turbolib::perception;
 
 frc::Pose2d TurboPoseEstimator::GetPose2D() {
-  auto pose = poseEstimator.GetEstimatedPosition();
-
-  return pose;
+  return poseEstimator.GetEstimatedPosition();
 }
 
 void TurboPoseEstimator::ResetEstimatorPosition(const frc::Rotation2d& gyroAngle,
@@ -38,8 +37,22 @@ void TurboPoseEstimator::TryVisionUpdateWithCamera(turbolib::perception::TurboPh
 }
 
 void TurboPoseEstimator::UpdateWithAllAvailableVisionMeasurements() {
+  if (localizationCameras.empty()) {
+    auto& alertManager = tkit::AlertManager::GetInstance();
+    alertManager.Warning("no_localization_cameras", "No localization cameras to update.");
+    return;
+  }
+
+  tkit::AlertManager::GetInstance().ClearManualAlert("no_localization_cameras");
+
   for (auto& camera : localizationCameras) {
     TryVisionUpdateWithCamera(camera);
+  }
+}
+
+void TurboPoseEstimator::UpdateAllSims(frc::Pose2d pose) {
+  for (auto& camera : localizationCameras) {
+    camera.UpdateSim(pose);
   }
 }
 

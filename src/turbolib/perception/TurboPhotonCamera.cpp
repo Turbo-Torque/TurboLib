@@ -25,9 +25,7 @@ using namespace turbolib::perception;
 
 TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName, const frc::Transform3d& cameraInBotSpace,
                                      frc::AprilTagField field)
-    : layout(frc::AprilTagFieldLayout::LoadField(field)),
-      camera(cameraName),
-      poseEstimator(layout, photon::MULTI_TAG_PNP_ON_COPROCESSOR, cameraInBotSpace) {
+    : layout(frc::AprilTagFieldLayout::LoadField(field)), camera(cameraName), poseEstimator(layout, cameraInBotSpace) {
   if constexpr (frc::RobotBase::IsSimulation()) {
     auto cameraProp = photon::SimCameraProperties();
     cameraProp.SetCalibration(1280, 720, 75_deg);
@@ -61,7 +59,7 @@ std::vector<turbolib::structure::PoseTimestampPair> TurboPhotonCamera::FetchPose
 
   for (const auto& result : camera.GetAllUnreadResults()) {
     lastResult = result;
-    if (auto visionEst = poseEstimator.Update(result)) {
+    if (auto visionEst = poseEstimator.EstimateCoprocMultiTagPose(result)) {
       poses.emplace_back(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp);
     }
   }

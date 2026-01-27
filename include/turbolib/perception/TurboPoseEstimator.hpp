@@ -24,7 +24,7 @@ class TurboPoseEstimator {
 
  public:
   TurboPoseEstimator(const frc::Rotation2d& gyroAngle, const std::array<frc::SwerveModulePosition, 4>& modulePositions,
-                     const frc::Pose2d& initialPose, frc::SwerveDriveKinematics<4> kinematics)
+                     const frc::Pose2d& initialPose, frc::SwerveDriveKinematics<4>& kinematics)
       : poseEstimator(kinematics, gyroAngle, modulePositions, initialPose) {}
 
   frc::Pose2d GetPose2D();
@@ -34,6 +34,7 @@ class TurboPoseEstimator {
                                    const std::array<frc::SwerveModulePosition, 4>& modulePositions);
   void TryVisionUpdateWithCamera(turbolib::perception::TurboPhotonCamera& camera);
   void UpdateWithAllAvailableVisionMeasurements();
+  void UpdateAllSims(frc::Pose2d pose);
 
   void AddLocalizationCamera(const std::string& cameraName, const frc::Transform3d& cameraInBotSpace,
                              frc::AprilTagField field) {
