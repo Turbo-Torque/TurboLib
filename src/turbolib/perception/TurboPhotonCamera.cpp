@@ -31,9 +31,9 @@ TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName, const frc::T
     auto cameraProp = photon::SimCameraProperties();
     cameraProp.SetCalibration(1280, 720, 75_deg);
     cameraProp.SetCalibError(0.25, 0.08);
-    cameraProp.SetFPS(units::hertz_t{30});
-    cameraProp.SetAvgLatency(35_ms);
-    cameraProp.SetLatencyStdDev(5_ms);
+    cameraProp.SetFPS(units::hertz_t{60});
+    cameraProp.SetAvgLatency(20_ms);
+    cameraProp.SetLatencyStdDev(3_ms);
 
     systemSim.emplace("main");
     cameraSim.emplace(photon::PhotonCameraSim(&camera, cameraProp));

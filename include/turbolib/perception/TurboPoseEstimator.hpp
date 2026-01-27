@@ -4,6 +4,7 @@
 #pragma once
 
 #include <array>
+#include <memory>
 #include <optional>
 #include <string>
 #include <vector>
@@ -20,7 +21,7 @@ class TurboPoseEstimator {
  private:
   frc::SwerveDrivePoseEstimator<4> poseEstimator;
 
-  std::vector<turbolib::perception::TurboPhotonCamera> localizationCameras;
+  std::vector<std::unique_ptr<turbolib::perception::TurboPhotonCamera>> localizationCameras;
 
  public:
   TurboPoseEstimator(const frc::Rotation2d& gyroAngle, const std::array<frc::SwerveModulePosition, 4>& modulePositions,
@@ -38,7 +39,8 @@ class TurboPoseEstimator {
 
   void AddLocalizationCamera(const std::string& cameraName, const frc::Transform3d& cameraInBotSpace,
                              frc::AprilTagField field) {
-    localizationCameras.emplace_back(cameraName, cameraInBotSpace, field);
+    localizationCameras.push_back(
+        std::make_unique<turbolib::perception::TurboPhotonCamera>(cameraName, cameraInBotSpace, field));
   }
 
   std::optional<photon::PhotonPipelineResult> GetLastVisionResult(int cameraIdx) const {
@@ -46,7 +48,7 @@ class TurboPoseEstimator {
       return std::nullopt;
     }
 
-    return localizationCameras[cameraIdx].GetLastResult();
+    return localizationCameras[cameraIdx]->GetLastResult();
   }
 
   bool SeesTag() const;

@@ -46,13 +46,13 @@ void TurboPoseEstimator::UpdateWithAllAvailableVisionMeasurements() {
   tkit::AlertManager::GetInstance().ClearManualAlert("no_localization_cameras");
 
   for (auto& camera : localizationCameras) {
-    TryVisionUpdateWithCamera(camera);
+    TryVisionUpdateWithCamera(*camera);
   }
 }
 
 void TurboPoseEstimator::UpdateAllSims(frc::Pose2d pose) {
   for (auto& camera : localizationCameras) {
-    camera.UpdateSim(pose);
+    camera->UpdateSim(pose);
   }
 }
 
@@ -60,7 +60,7 @@ bool TurboPoseEstimator::SeesTag() const {
   bool seesTag = false;
 
   for (const auto& camera : localizationCameras) {
-    if (camera.SeesTag()) {
+    if (camera->SeesTag()) {
       seesTag = true;
       break;
     }
