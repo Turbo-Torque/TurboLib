@@ -4,26 +4,29 @@
 #include "turbolib/perception/TurboPoseEstimator.hpp"
 
 #include <cassert>
+#include <mutex>
 #include <vector>
 
 #include "frc/geometry/Pose2d.h"
-#include "telemetrykit/core/AlertManager.h"
 #include "turbolib/structure/PoseTimestampPair.hpp"
 
 using namespace turbolib::perception;
 
 frc::Pose2d TurboPoseEstimator::GetPose2D() {
+  std::scoped_lock lock(estimatorMutex);
   return poseEstimator.GetEstimatedPosition();
 }
 
 void TurboPoseEstimator::ResetEstimatorPosition(const frc::Rotation2d& gyroAngle,
                                                 const std::array<frc::SwerveModulePosition, 4>& modulePositions,
                                                 const frc::Pose2d& pose) {
+  std::scoped_lock lock(estimatorMutex);
   poseEstimator.ResetPosition(gyroAngle, modulePositions, pose);
 }
 
 void TurboPoseEstimator::UpdateWithOdometryAndVision(const frc::Rotation2d& gyroAngle,
                                                      const std::array<frc::SwerveModulePosition, 4>& modulePositions) {
+  std::scoped_lock lock(estimatorMutex);
   poseEstimator.Update(gyroAngle, modulePositions);
   UpdateWithAllAvailableVisionMeasurements();
 }
@@ -37,14 +40,7 @@ void TurboPoseEstimator::TryVisionUpdateWithCamera(turbolib::perception::TurboPh
 }
 
 void TurboPoseEstimator::UpdateWithAllAvailableVisionMeasurements() {
-  if (localizationCameras.empty()) {
-    auto& alertManager = tkit::AlertManager::GetInstance();
-    alertManager.Warning("no_localization_cameras", "No localization cameras to update.");
-    return;
-  }
-
-  tkit::AlertManager::GetInstance().ClearManualAlert("no_localization_cameras");
-
+  std::scoped_lock lock(estimatorMutex);
   for (auto& camera : localizationCameras) {
     TryVisionUpdateWithCamera(*camera);
   }
