@@ -5,7 +5,6 @@
 
 #include <array>
 #include <memory>
-#include <mutex>
 #include <optional>
 #include <string>
 #include <vector>
@@ -21,8 +20,8 @@ namespace turbolib::perception {
 class TurboPoseEstimator {
  private:
   frc::SwerveDrivePoseEstimator<4> poseEstimator;
+
   std::vector<std::unique_ptr<turbolib::perception::TurboPhotonCamera>> localizationCameras;
-  mutable std::mutex estimatorMutex;
 
  public:
   TurboPoseEstimator(const frc::Rotation2d& gyroAngle, const std::array<frc::SwerveModulePosition, 4>& modulePositions,

@@ -12,10 +12,12 @@
 #include "frc/apriltag/AprilTagFieldLayout.h"
 #include "frc/apriltag/AprilTagFields.h"
 #include "frc/geometry/Pose2d.h"
+#include "frc/smartdashboard/SmartDashboard.h"
 #include "photon/PhotonCamera.h"
 #include "photon/PhotonPoseEstimator.h"
 #include "photon/simulation/PhotonCameraSim.h"
 #include "photon/simulation/SimCameraProperties.h"
+#include "telemetrykit/core/AlertManager.h"
 #include "telemetrykit/core/Logger.h"
 #include "turbolib/structure/PoseTimestampPair.hpp"
 #include "units/frequency.h"
@@ -30,7 +32,7 @@ TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName, const frc::T
     auto cameraProp = photon::SimCameraProperties();
     cameraProp.SetCalibration(1280, 720, 75_deg);
     cameraProp.SetCalibError(0.25, 0.08);
-    cameraProp.SetFPS(units::hertz_t{20});  // Reduced from 60 to 20 Hz
+    cameraProp.SetFPS(units::hertz_t{60});
     cameraProp.SetAvgLatency(20_ms);
     cameraProp.SetLatencyStdDev(3_ms);
 
@@ -39,10 +41,12 @@ TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName, const frc::T
 
     cameraSim->EnableRawStream(true);
     cameraSim->EnabledProcessedStream(true);
-    cameraSim->EnableDrawWireframe(false);
+    cameraSim->EnableDrawWireframe(true);
 
     systemSim->AddAprilTags(layout);
     systemSim->AddCamera(&cameraSim.value(), cameraInBotSpace);
+
+    frc::SmartDashboard::PutData("Sim Field", &systemSim->GetDebugField());
   }
 }
 
@@ -59,6 +63,10 @@ std::vector<turbolib::structure::PoseTimestampPair> TurboPhotonCamera::FetchPose
     lastResult = result;
     if (auto visionEst = poseEstimator.EstimateCoprocMultiTagPose(result)) {
       poses.emplace_back(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp);
+
+      tkit::AlertManager::GetInstance().ClearManualAlert("estimation_failed");
+    } else {
+      tkit::AlertManager::GetInstance().Warning("estimation_failed", "The PhotonVision estimation failed");
     }
   }
 
