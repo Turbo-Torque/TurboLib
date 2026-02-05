@@ -17,7 +17,6 @@
 #include "photon/PhotonPoseEstimator.h"
 #include "photon/simulation/PhotonCameraSim.h"
 #include "photon/simulation/SimCameraProperties.h"
-#include "telemetrykit/core/AlertManager.h"
 #include "telemetrykit/core/Logger.h"
 #include "turbolib/structure/PoseTimestampPair.hpp"
 #include "units/frequency.h"
@@ -63,10 +62,6 @@ std::vector<turbolib::structure::PoseTimestampPair> TurboPhotonCamera::FetchPose
     lastResult = result;
     if (auto visionEst = poseEstimator.EstimateCoprocMultiTagPose(result)) {
       poses.emplace_back(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp);
-
-      tkit::AlertManager::GetInstance().ClearManualAlert("estimation_failed");
-    } else {
-      tkit::AlertManager::GetInstance().Warning("estimation_failed", "The PhotonVision estimation failed");
     }
   }
 
