@@ -31,7 +31,7 @@ TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName, const frc::T
     auto cameraProp = photon::SimCameraProperties();
     cameraProp.SetCalibration(1280, 720, 75_deg);
     cameraProp.SetCalibError(0.25, 0.08);
-    cameraProp.SetFPS(units::hertz_t{60});
+    cameraProp.SetFPS(units::hertz_t{20});
     cameraProp.SetAvgLatency(20_ms);
     cameraProp.SetLatencyStdDev(3_ms);
 
@@ -40,7 +40,7 @@ TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName, const frc::T
 
     cameraSim->EnableRawStream(true);
     cameraSim->EnabledProcessedStream(true);
-    cameraSim->EnableDrawWireframe(true);
+    cameraSim->EnableDrawWireframe(false);
 
     systemSim->AddAprilTags(layout);
     systemSim->AddCamera(&cameraSim.value(), cameraInBotSpace);
