@@ -13,7 +13,6 @@
 #include "ctre/phoenix6/CANBus.hpp"
 #include "ctre/phoenix6/StatusSignal.hpp"
 #include "ctre/phoenix6/core/CoreCANcoder.hpp"
-#include "fmt/format.h"
 #include "frc/controller/PIDController.h"
 #include "frc/controller/SimpleMotorFeedforward.h"
 #include "frc/geometry/Rotation2d.h"
@@ -22,7 +21,6 @@
 #include "rev/SparkLowLevel.h"
 #include "rev/SparkMax.h"
 #include "rev/config/SparkBaseConfig.h"
-#include "telemetrykit/core/Logger.h"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/base.h"
@@ -111,14 +109,6 @@ void NeoKrakenModule::SetModuleState(frc::SwerveModuleState state) {
   driveMotor.SetVoltage(output);  // TODO: TUR-11 replace with SetControl
   steerMotor.Set(-steerPercent);
 }
-
-void NeoKrakenModule::UpdateTelemetry() {
-  tkit::RecordOutput(fmt::format("DriveSubsystem/{}/DriveVelocity", name), GetVelocity().value());
-  tkit::RecordOutput(fmt::format("DriveSubsystem/{}/DrivePosition", name), GetPosition());
-  tkit::RecordOutput(fmt::format("DriveSubsystem/{}/SteerAngle", name), GetEncoderPosition());
-  tkit::RecordOutput(fmt::format("DriveSubsystem/{}/SteerSetpoint", name), setpoint);
-}
-
 double NeoKrakenModule::GetEncoderPosition() {
   const ctre::phoenix6::StatusSignal<units::turn_t> angle = encoderObject.GetAbsolutePosition();
   const double rawValue = angle.GetValueAsDouble();

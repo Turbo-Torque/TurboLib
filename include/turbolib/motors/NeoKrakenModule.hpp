@@ -55,7 +55,5 @@ class NeoKrakenModule final {
   frc::SwerveModuleState GetModuleState();
   frc::SwerveModulePosition GetModulePosition();
   units::meters_per_second_t GetVelocity();
-
-  void UpdateTelemetry();
 };
 }  // namespace turbolib::motors
