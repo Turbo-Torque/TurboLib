@@ -6,8 +6,8 @@
 #include <cassert>
 #include <vector>
 
+#include "frc/DataLogManager.h"
 #include "frc/geometry/Pose2d.h"
-#include "telemetrykit/core/AlertManager.h"
 #include "turbolib/structure/PoseTimestampPair.hpp"
 
 using namespace turbolib::perception;
@@ -38,12 +38,9 @@ void TurboPoseEstimator::TryVisionUpdateWithCamera(turbolib::perception::TurboPh
 
 void TurboPoseEstimator::UpdateWithAllAvailableVisionMeasurements() {
   if (localizationCameras.empty()) {
-    auto& alertManager = tkit::AlertManager::GetInstance();
-    alertManager.Warning("no_localization_cameras", "No localization cameras to update.");
+    frc::DataLogManager::Log("No localization cameras configured for pose estimation!");
     return;
   }
-
-  tkit::AlertManager::GetInstance().ClearManualAlert("no_localization_cameras");
 
   for (auto& camera : localizationCameras) {
     TryVisionUpdateWithCamera(*camera);
