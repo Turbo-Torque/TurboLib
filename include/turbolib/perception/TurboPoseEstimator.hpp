@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <memory>
 #include <optional>
@@ -38,9 +39,9 @@ class TurboPoseEstimator {
   void UpdateAllSims(frc::Pose2d pose);
 
   void AddLocalizationCamera(const std::string& cameraName, const frc::Transform3d& cameraInBotSpace,
-                             frc::AprilTagField field) {
+                             frc::AprilTagField field, bool enableSim = false) {
     localizationCameras.push_back(
-        std::make_unique<turbolib::perception::TurboPhotonCamera>(cameraName, cameraInBotSpace, field));
+        std::make_unique<turbolib::perception::TurboPhotonCamera>(cameraName, cameraInBotSpace, field, enableSim));
   }
 
   std::optional<photon::PhotonPipelineResult> GetLastVisionResult(int cameraIdx) const {
@@ -52,5 +53,9 @@ class TurboPoseEstimator {
   }
 
   bool SeesTag() const;
+  bool HasSimulationCameras() const {
+    return std::any_of(localizationCameras.begin(), localizationCameras.end(),
+                       [](const std::unique_ptr<TurboPhotonCamera>& cam) { return cam->IsSimulated(); });
+  }
 };
 }  // namespace turbolib::perception

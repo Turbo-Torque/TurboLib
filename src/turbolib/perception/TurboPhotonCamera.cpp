@@ -8,25 +8,22 @@
 #include <string_view>
 #include <vector>
 
-#include "frc/RobotBase.h"
 #include "frc/apriltag/AprilTagFieldLayout.h"
 #include "frc/apriltag/AprilTagFields.h"
 #include "frc/geometry/Pose2d.h"
-#include "frc/smartdashboard/SmartDashboard.h"
 #include "photon/PhotonCamera.h"
 #include "photon/PhotonPoseEstimator.h"
-#include "photon/simulation/PhotonCameraSim.h"
-#include "photon/simulation/SimCameraProperties.h"
 #include "turbolib/structure/PoseTimestampPair.hpp"
-#include "units/frequency.h"
-#include "units/time.h"
 
 using namespace turbolib::perception;
 
 TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName, const frc::Transform3d& cameraInBotSpace,
-                                     frc::AprilTagField field)
+                                     frc::AprilTagField field, bool enableSim)
     : layout(frc::AprilTagFieldLayout::LoadField(field)), camera(cameraName), poseEstimator(layout, cameraInBotSpace) {
-  if constexpr (frc::RobotBase::IsSimulation()) {
+  visionPosePublisher =
+      nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("DriveSubsystem/VisionPose").Publish();
+
+  if (enableSim) {
     auto cameraProp = photon::SimCameraProperties();
     cameraProp.SetCalibration(1280, 720, 75_deg);
     cameraProp.SetCalibError(0.25, 0.08);
@@ -49,7 +46,7 @@ TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName, const frc::T
 }
 
 void TurboPhotonCamera::UpdateSim(const frc::Pose2d& robotPose) {
-  if constexpr (frc::RobotBase::IsSimulation()) {
+  if (systemSim.has_value()) {
     systemSim->Update(robotPose);
   }
 }
@@ -69,8 +66,7 @@ std::vector<turbolib::structure::PoseTimestampPair> TurboPhotonCamera::FetchPose
   } else {
     seesTag = true;
 
-    // tkit::RecordOutput("DriveSubsystem/VisionPose", tkit::MakeStructValue(poses.front().getPose()));
-    // TODO: replace with datalogmanager
+    visionPosePublisher.Set(poses.front().getPose());
   }
 
   return poses;

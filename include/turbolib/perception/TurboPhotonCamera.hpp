@@ -7,9 +7,11 @@
 #include <string>
 #include <vector>
 
+#include "frc/RobotBase.h"
 #include "frc/apriltag/AprilTagFieldLayout.h"
 #include "frc/apriltag/AprilTagFields.h"
 #include "frc/geometry/Pose2d.h"
+#include "networktables/StructTopic.h"
 #include "photon/PhotonCamera.h"
 #include "photon/PhotonPoseEstimator.h"
 #include "photon/simulation/PhotonCameraSim.h"
@@ -28,14 +30,18 @@ class TurboPhotonCamera {
   std::optional<photon::PhotonCameraSim> cameraSim = std::nullopt;
   std::optional<photon::PhotonPipelineResult> lastResult = std::nullopt;
 
+  nt::StructPublisher<frc::Pose2d> visionPosePublisher;
+
   bool seesTag = false;
 
  public:
-  TurboPhotonCamera(const std::string& cameraName, const frc::Transform3d& cameraInBotSpace, frc::AprilTagField field);
+  TurboPhotonCamera(const std::string& cameraName, const frc::Transform3d& cameraInBotSpace, frc::AprilTagField field,
+                    bool enableSim = frc::RobotBase::IsSimulation());
   void UpdateSim(const frc::Pose2d& robotPose);
   std::vector<structure::PoseTimestampPair> FetchPose();
   std::optional<photon::PhotonPipelineResult> GetLastResult() const { return lastResult; }
   static int GetNumTargets(const photon::PhotonPipelineResult& result) { return result.GetTargets().size(); }
   bool SeesTag() const { return seesTag; }
+  bool IsSimulated() const { return cameraSim.has_value(); }
 };
 }  // namespace turbolib::perception
