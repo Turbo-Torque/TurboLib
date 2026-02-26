@@ -25,7 +25,7 @@ TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName, const frc::T
 
   if (enableSim) {
     auto cameraProp = photon::SimCameraProperties();
-    cameraProp.SetCalibration(1280, 720, 75_deg);
+    cameraProp.SetCalibration(640, 480, 75_deg);
     cameraProp.SetCalibError(0.25, 0.08);
     cameraProp.SetFPS(units::hertz_t{20});
     cameraProp.SetAvgLatency(20_ms);
@@ -58,8 +58,13 @@ std::vector<turbolib::structure::PoseTimestampPair> TurboPhotonCamera::FetchPose
     lastResult = result;
     if (auto visionEst = poseEstimator.EstimateCoprocMultiTagPose(result)) {
       poses.emplace_back(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp);
+    } else {
+      auto singleTargetEst = poseEstimator.EstimateLowestAmbiguityPose(result);
+      if (singleTargetEst) {
+        poses.emplace_back(singleTargetEst->estimatedPose.ToPose2d(), singleTargetEst->timestamp);
+      }
     }
-  }
+  } 
 
   if (poses.empty()) {
     seesTag = false;
