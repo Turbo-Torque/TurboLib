@@ -30,7 +30,6 @@ class NeoKrakenModule final {
   rev::spark::SparkMax steerMotor;
   ctre::phoenix6::hardware::CANcoder encoderObject;
 
-  double offset;
   double setpoint{};
 
   frc::SimpleMotorFeedforward<units::meters> ff;
@@ -41,8 +40,7 @@ class NeoKrakenModule final {
   constexpr static double kCanCoderMultiplier = 2 * M_PI;
 
  public:
-  NeoKrakenModule(const std::string& name, int driveID, int steerID, int encoderID, double offset,
-                  const std::string& can = "");
+  NeoKrakenModule(const std::string& name, int driveID, int steerID, int encoderID, const std::string& can = "");
 
   void ConfigPIDInternal();
   static void ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX& target);

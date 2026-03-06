@@ -12,6 +12,7 @@
 
 #include "ctre/phoenix6/CANBus.hpp"
 #include "ctre/phoenix6/StatusSignal.hpp"
+#include "ctre/phoenix6/controls/VoltageOut.hpp"
 #include "ctre/phoenix6/core/CoreCANcoder.hpp"
 #include "frc/controller/PIDController.h"
 #include "frc/controller/SimpleMotorFeedforward.h"
@@ -30,13 +31,12 @@
 using namespace turbolib::motors;
 
 NeoKrakenModule::NeoKrakenModule(const std::string& name, const int driveID, const int steerID, const int encoderID,
-                                 const double offset, const std::string& can)
+                                 const std::string& can)
     : name(name),
       canBus(can),
       driveMotor(driveID, canBus),
       steerMotor(steerID, rev::spark::SparkLowLevel::MotorType::kBrushless),
       encoderObject(encoderID, canBus),
-      offset(offset),
       ff(0_V, 0_V / 1_mps),
       driveController(0.0, 0.0, 0.0),
       steerController(0.0, 0.0, 0.0) {
@@ -106,16 +106,16 @@ void NeoKrakenModule::SetModuleState(frc::SwerveModuleState state) {
       ff.Calculate(speed) + units::volt_t{driveController.Calculate(GetVelocity().value(), speed.value())};
   const double steerPercent = steerController.Calculate(currentMeasurement, angle.value());
 
-  driveMotor.SetVoltage(output);  // TODO: TUR-11 replace with SetControl
+  driveMotor.SetControl(ctre::phoenix6::controls::VoltageOut{output});
   steerMotor.Set(-steerPercent);
 }
+
 double NeoKrakenModule::GetEncoderPosition() {
   const ctre::phoenix6::StatusSignal<units::turn_t> angle = encoderObject.GetAbsolutePosition();
   const double rawValue = angle.GetValueAsDouble();
   const double rawRadians = rawValue * kCanCoderMultiplier;
-  const double corrected = rawRadians - offset;
 
-  return corrected;
+  return rawRadians;
 }
 
 double NeoKrakenModule::GetPosition() {
