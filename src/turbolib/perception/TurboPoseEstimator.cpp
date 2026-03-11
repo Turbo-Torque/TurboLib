@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "frc/DataLogManager.h"
+#include "frc/DriverStation.h"
 #include "frc/geometry/Pose2d.h"
 #include "turbolib/structure/PoseTimestampPair.hpp"
 
@@ -25,7 +26,10 @@ void TurboPoseEstimator::ResetEstimatorPosition(const frc::Rotation2d& gyroAngle
 void TurboPoseEstimator::UpdateWithOdometryAndVision(const frc::Rotation2d& gyroAngle,
                                                      const std::array<frc::SwerveModulePosition, 4>& modulePositions) {
   poseEstimator.Update(gyroAngle, modulePositions);
-  UpdateWithAllAvailableVisionMeasurements();
+
+  if (!frc::DriverStation::IsAutonomous()) {
+    UpdateWithAllAvailableVisionMeasurements();
+  }
 }
 
 void TurboPoseEstimator::TryVisionUpdateWithCamera(turbolib::perception::TurboPhotonCamera& camera) {
