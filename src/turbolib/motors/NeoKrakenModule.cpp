@@ -67,8 +67,16 @@ void NeoKrakenModule::ConfigPIDInternal() {
 
 void NeoKrakenModule::ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX& target) {
   ctre::phoenix6::configs::TalonFXConfiguration config{};
+
   target.GetConfigurator().Refresh(config);
+
   config.MotorOutput.NeutralMode = ctre::phoenix6::signals::NeutralModeValue::Brake;
+
+  config.CurrentLimits.StatorCurrentLimit = 70_A;
+  config.CurrentLimits.SupplyCurrentLimit = 50_A;
+
+  config.CurrentLimits.SupplyCurrentLimitEnable = true;
+  config.CurrentLimits.StatorCurrentLimitEnable = true;
 
   CurrentLimitsDrive(config);
 
