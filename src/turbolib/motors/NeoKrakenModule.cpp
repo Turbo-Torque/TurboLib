@@ -106,12 +106,13 @@ void NeoKrakenModule::SetModuleState(frc::SwerveModuleState state) {
   const frc::Rotation2d currentAngle{units::radian_t{currentMeasurement}};
   state.Optimize(currentAngle);
 
-  const units::meters_per_second_t speed = state.speed;
+  const units::meters_per_second_t compensatedSpeed = state.speed * (state.angle - currentAngle).Cos();
+
   const units::radian_t angle = state.angle.Radians();
   setpoint = angle.value();
 
-  units::volt_t output =
-      ff.Calculate(speed) + units::volt_t{driveController.Calculate(GetVelocity().value(), speed.value())};
+  units::volt_t output = ff.Calculate(compensatedSpeed) +
+                         units::volt_t{driveController.Calculate(GetVelocity().value(), compensatedSpeed.value())};
   const double steerPercent = steerController.Calculate(currentMeasurement, angle.value());
 
   driveMotor.SetControl(ctre::phoenix6::controls::VoltageOut{output});
