@@ -56,15 +56,11 @@ std::vector<turbolib::structure::PoseTimestampPair> TurboPhotonCamera::FetchPose
 
   for (const auto& result : camera.GetAllUnreadResults()) {
     lastResult = result;
+
     if (auto visionEst = poseEstimator.EstimateCoprocMultiTagPose(result)) {
       poses.emplace_back(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp);
-    } else {
-      auto singleTargetEst = poseEstimator.EstimateLowestAmbiguityPose(result);
-      if (singleTargetEst) {
-        poses.emplace_back(singleTargetEst->estimatedPose.ToPose2d(), singleTargetEst->timestamp);
-      }
     }
-  } 
+  }
 
   if (poses.empty()) {
     seesTag = false;

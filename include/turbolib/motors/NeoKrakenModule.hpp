@@ -15,6 +15,7 @@
 #include "ctre/phoenix6/CANBus.hpp"
 #include "frc/kinematics/SwerveModulePosition.h"
 #include "frc/kinematics/SwerveModuleState.h"
+#include "units/current.h"
 #include "units/length.h"
 #include "units/velocity.h"
 
@@ -53,5 +54,6 @@ class NeoKrakenModule final {
   frc::SwerveModuleState GetModuleState();
   frc::SwerveModulePosition GetModulePosition();
   units::meters_per_second_t GetVelocity();
+  units::ampere_t GetCurrentDraw();
 };
 }  // namespace turbolib::motors

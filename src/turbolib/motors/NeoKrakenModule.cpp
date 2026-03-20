@@ -144,3 +144,7 @@ units::meters_per_second_t NeoKrakenModule::GetVelocity() {
   const ctre::phoenix6::StatusSignal<units::turns_per_second_t> velocity = driveMotor.GetVelocity();
   return units::meters_per_second_t{velocity.GetValue().value() * kVelocityMultiplier};
 }
+
+units::ampere_t NeoKrakenModule::GetCurrentDraw() {
+  return driveMotor.GetTorqueCurrent().GetValue();
+}
