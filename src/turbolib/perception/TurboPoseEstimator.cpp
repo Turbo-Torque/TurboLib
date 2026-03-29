@@ -20,18 +20,21 @@ void TurboPoseEstimator::ResetEstimatorPosition(const frc::Rotation2d& gyroAngle
                                                 const std::array<frc::SwerveModulePosition, 4>& modulePositions,
                                                 const frc::Pose2d& pose) {
   poseEstimator.ResetPosition(gyroAngle, modulePositions, pose);
+
+  for (const auto& camera : localizationCameras) {
+    camera->ResetHeading(gyroAngle);
+  }
 }
 
 void TurboPoseEstimator::UpdateWithOdometryAndVision(const frc::Rotation2d& gyroAngle,
                                                      const std::array<frc::SwerveModulePosition, 4>& modulePositions) {
   poseEstimator.Update(gyroAngle, modulePositions);
 
-  if (false) {  // disable vision entirely
-    UpdateWithAllAvailableVisionMeasurements();
-  }
+  UpdateWithAllAvailableVisionMeasurements(gyroAngle);
 }
 
-void TurboPoseEstimator::TryVisionUpdateWithCamera(turbolib::perception::TurboPhotonCamera& camera) {
+void TurboPoseEstimator::TryVisionUpdateWithCamera(turbolib::perception::TurboPhotonCamera& camera,
+                                                   const frc::Rotation2d& gyroAngle) {
   const std::vector<turbolib::structure::PoseTimestampPair> visionPoses = camera.FetchPose();
 
   for (const auto& pair : visionPoses) {
@@ -39,14 +42,14 @@ void TurboPoseEstimator::TryVisionUpdateWithCamera(turbolib::perception::TurboPh
   }
 }
 
-void TurboPoseEstimator::UpdateWithAllAvailableVisionMeasurements() {
+void TurboPoseEstimator::UpdateWithAllAvailableVisionMeasurements(const frc::Rotation2d& gyroAngle) {
   if (localizationCameras.empty()) {
     frc::DataLogManager::Log("No localization cameras configured for pose estimation!");
     return;
   }
 
   for (auto& camera : localizationCameras) {
-    TryVisionUpdateWithCamera(*camera);
+    TryVisionUpdateWithCamera(*camera, gyroAngle);
   }
 }
 

@@ -8,9 +8,11 @@
 #include <string_view>
 #include <vector>
 
+#include "frc/Timer.h"
 #include "frc/apriltag/AprilTagFieldLayout.h"
 #include "frc/apriltag/AprilTagFields.h"
 #include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Rotation2d.h"
 #include "photon/PhotonCamera.h"
 #include "photon/PhotonPoseEstimator.h"
 #include "turbolib/structure/PoseTimestampPair.hpp"
@@ -49,6 +51,14 @@ void TurboPhotonCamera::UpdateSim(const frc::Pose2d& robotPose) {
   if (systemSim.has_value()) {
     systemSim->Update(robotPose);
   }
+}
+
+void TurboPhotonCamera::UpdateHeading(const frc::Rotation2d& gyroAngle) {
+  poseEstimator.AddHeadingData(frc::Timer::GetFPGATimestamp(), gyroAngle);
+}
+
+void TurboPhotonCamera::ResetHeading(const frc::Rotation2d& gyroAngle) {
+  poseEstimator.ResetHeadingData(frc::Timer::GetFPGATimestamp(), gyroAngle);
 }
 
 std::vector<turbolib::structure::PoseTimestampPair> TurboPhotonCamera::FetchPose() {

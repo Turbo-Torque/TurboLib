@@ -34,8 +34,8 @@ class TurboPoseEstimator {
                               const std::array<frc::SwerveModulePosition, 4>& modulePositions, const frc::Pose2d& pose);
   void UpdateWithOdometryAndVision(const frc::Rotation2d& gyroAngle,
                                    const std::array<frc::SwerveModulePosition, 4>& modulePositions);
-  void TryVisionUpdateWithCamera(turbolib::perception::TurboPhotonCamera& camera);
-  void UpdateWithAllAvailableVisionMeasurements();
+  void TryVisionUpdateWithCamera(turbolib::perception::TurboPhotonCamera& camera, const frc::Rotation2d& gyroAngle);
+  void UpdateWithAllAvailableVisionMeasurements(const frc::Rotation2d& gyroAngle);
   void UpdateAllSims(frc::Pose2d pose);
 
   void AddLocalizationCamera(const std::string& cameraName, const frc::Transform3d& cameraInBotSpace,
