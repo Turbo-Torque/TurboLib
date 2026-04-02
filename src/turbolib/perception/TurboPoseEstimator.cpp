@@ -30,7 +30,9 @@ void TurboPoseEstimator::UpdateWithOdometryAndVision(const frc::Rotation2d& gyro
                                                      const std::array<frc::SwerveModulePosition, 4>& modulePositions) {
   poseEstimator.Update(gyroAngle, modulePositions);
 
-  UpdateWithAllAvailableVisionMeasurements(gyroAngle);
+  if (visionEnabled) {
+    UpdateWithAllAvailableVisionMeasurements(gyroAngle);
+  }
 }
 
 void TurboPoseEstimator::TryVisionUpdateWithCamera(turbolib::perception::TurboPhotonCamera& camera,

@@ -24,6 +24,8 @@ class TurboPoseEstimator {
 
   std::vector<std::unique_ptr<turbolib::perception::TurboPhotonCamera>> localizationCameras;
 
+  bool visionEnabled = true;
+
  public:
   TurboPoseEstimator(const frc::Rotation2d& gyroAngle, const std::array<frc::SwerveModulePosition, 4>& modulePositions,
                      const frc::Pose2d& initialPose, frc::SwerveDriveKinematics<4>& kinematics)
@@ -37,6 +39,9 @@ class TurboPoseEstimator {
   void TryVisionUpdateWithCamera(turbolib::perception::TurboPhotonCamera& camera, const frc::Rotation2d& gyroAngle);
   void UpdateWithAllAvailableVisionMeasurements(const frc::Rotation2d& gyroAngle);
   void UpdateAllSims(frc::Pose2d pose);
+
+  bool GetVisionEnabled() { return visionEnabled; }
+  void SetVisionEnabled(bool enabled) { visionEnabled = enabled; }
 
   void AddLocalizationCamera(const std::string& cameraName, const frc::Transform3d& cameraInBotSpace,
                              frc::AprilTagField field, bool enableSim = false) {
