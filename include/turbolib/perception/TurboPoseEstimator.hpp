@@ -32,6 +32,7 @@ class TurboPoseEstimator {
       : poseEstimator(kinematics, gyroAngle, modulePositions, initialPose) {}
 
   frc::Pose2d GetPose2D();
+
   void ResetEstimatorPosition(const frc::Rotation2d& gyroAngle,
                               const std::array<frc::SwerveModulePosition, 4>& modulePositions, const frc::Pose2d& pose);
   void UpdateWithOdometryAndVision(const frc::Rotation2d& gyroAngle,

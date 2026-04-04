@@ -38,12 +38,14 @@ class TurboPhotonCamera {
  public:
   TurboPhotonCamera(const std::string& cameraName, const frc::Transform3d& cameraInBotSpace, frc::AprilTagField field,
                     bool enableSim = frc::RobotBase::IsSimulation());
+
   void UpdateSim(const frc::Pose2d& robotPose);
   void UpdateHeading(const frc::Rotation2d& gyroAngle);
   void ResetHeading(const frc::Rotation2d& gyroAngle);
+
   std::vector<structure::PoseTimestampPair> FetchPose();
   std::optional<photon::PhotonPipelineResult> GetLastResult() const { return lastResult; }
-  static int GetNumTargets(const photon::PhotonPipelineResult& result) { return result.GetTargets().size(); }
+
   bool SeesTag() const { return seesTag; }
   bool IsSimulated() const { return cameraSim.has_value(); }
 };
