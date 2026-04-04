@@ -3,18 +3,18 @@
 
 #pragma once
 
-#include <frc/controller/PIDController.h>
-#include <frc/controller/SimpleMotorFeedforward.h>
-#include <rev/SparkMax.h>
-
 #include <string>
 
-#include <ctre/phoenix6/CANcoder.hpp>
-#include <ctre/phoenix6/TalonFX.hpp>
-
-#include "ctre/phoenix6/CANBus.hpp"
+#include <frc/controller/PIDController.h>
+#include <frc/controller/SimpleMotorFeedforward.h>
 #include "frc/kinematics/SwerveModulePosition.h"
 #include "frc/kinematics/SwerveModuleState.h"
+
+#include <rev/SparkMax.h>
+#include <ctre/phoenix6/CANcoder.hpp>
+#include <ctre/phoenix6/TalonFX.hpp>
+#include "ctre/phoenix6/CANBus.hpp"
+
 #include "units/current.h"
 #include "units/length.h"
 #include "units/velocity.h"
@@ -31,7 +31,7 @@ class NeoKrakenModule final {
   rev::spark::SparkMax steerMotor;
   ctre::phoenix6::hardware::CANcoder encoderObject;
 
-  double setpoint{};
+  double setpoint = 0.0;
 
   frc::SimpleMotorFeedforward<units::meters> ff;
   frc::PIDController driveController, steerController;
@@ -40,20 +40,37 @@ class NeoKrakenModule final {
   constexpr static double kPositionMultiplier = (1 / GEAR_RATIO) * (units::meter_t{WHEEL_DIAMETER}.value() * M_PI);
   constexpr static double kCanCoderMultiplier = 2 * M_PI;
 
+  void ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX& target);
+  void ConfigSteerMotor(rev::spark::SparkMax& target);
+  void SetupEncoder(ctre::phoenix6::hardware::CANcoder& encoder);
+  void CurrentLimitsDrive(ctre::phoenix6::configs::TalonFXConfiguration& config);
+
  public:
   NeoKrakenModule(const std::string& name, int driveID, int steerID, int encoderID, const std::string& can = "");
+  ~NeoKrakenModule() = default;
 
+  /// Configures the feedforward and PID values for the drive and steer motors.
   void ConfigPIDInternal();
-  static void ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX& target);
-  static void ConfigSteerMotor(rev::spark::SparkMax& target);
-  static void SetupEncoder(ctre::phoenix6::hardware::CANcoder& encoder);
-  static void CurrentLimitsDrive(ctre::phoenix6::configs::TalonFXConfiguration& config);
+
+  /// Sets the desired state of the module.
   void SetModuleState(frc::SwerveModuleState state);
+
+  /// Returns the angle of the module in radians.
   double GetEncoderPosition();
+
+  /// Returns the position of the module in meters.
   double GetPosition();
+
+  /// Returns the state of the module, including velocity in meters per second and angle in radians.
   frc::SwerveModuleState GetModuleState();
+
+  /// Returns the position of the module in meters and radians, respectively.
   frc::SwerveModulePosition GetModulePosition();
+
+  /// Returns the velocity of the module in meters per second.
   units::meters_per_second_t GetVelocity();
+
+  /// Returns the current draw of the drive motor in amperes.
   units::ampere_t GetCurrentDraw();
 };
 }  // namespace turbolib::motors

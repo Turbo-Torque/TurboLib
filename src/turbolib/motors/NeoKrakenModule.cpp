@@ -4,29 +4,36 @@
 #include "turbolib/motors/NeoKrakenModule.hpp"
 
 #include <cmath>
-#include <frc/smartdashboard/SmartDashboard.h>
-#include <units/velocity.h>
-#include <units/voltage.h>
-
 #include <string>
 
-#include "ctre/phoenix6/CANBus.hpp"
-#include "ctre/phoenix6/StatusSignal.hpp"
-#include "ctre/phoenix6/controls/VoltageOut.hpp"
-#include "ctre/phoenix6/core/CoreCANcoder.hpp"
-#include "frc/controller/PIDController.h"
-#include "frc/controller/SimpleMotorFeedforward.h"
-#include "frc/geometry/Rotation2d.h"
-#include "rev/ConfigureTypes.h"
-#include "rev/SparkBase.h"
-#include "rev/SparkLowLevel.h"
-#include "rev/SparkMax.h"
-#include "rev/config/SparkBaseConfig.h"
+#include <frc/controller/PIDController.h>
+#include <frc/controller/SimpleMotorFeedforward.h>
+#include <frc/geometry/Rotation2d.h>
+
+#include <rev/ConfigureTypes.h>
+#include <rev/SparkBase.h>
+#include <rev/SparkLowLevel.h>
+#include <rev/SparkMax.h>
+#include <rev/config/SparkBaseConfig.h>
+
+#include <ctre/phoenix6/CANBus.hpp>
+#include <ctre/phoenix6/StatusSignal.hpp>
+#include <ctre/phoenix6/controls/VoltageOut.hpp>
+#include <ctre/phoenix6/core/CoreCANcoder.hpp>
+
 #include "units/angle.h"
 #include "units/angular_velocity.h"
-#include "units/base.h"
 #include "units/current.h"
 #include "units/length.h"
+#include "units/velocity.h"
+#include "units/voltage.h"
+
+namespace {
+constexpr double kDriveP = 0.01;
+constexpr double kSteerP = 0.3;
+constexpr units::volt_t kKs = 0.2_V;
+constexpr auto kKv = 2.0_V / 1_mps;
+}  // namespace
 
 using namespace turbolib::motors;
 
@@ -57,10 +64,10 @@ void NeoKrakenModule::SetupEncoder(ctre::phoenix6::hardware::CANcoder& encoder) 
 }
 
 void NeoKrakenModule::ConfigPIDInternal() {
-  this->ff = frc::SimpleMotorFeedforward<units::meters>{0.2_V, 2.0_V / 1_mps};
+  this->ff = frc::SimpleMotorFeedforward<units::meters>{kKs, kKv};
 
-  this->driveController = frc::PIDController(0.01, 0.0, 0.0);
-  this->steerController = frc::PIDController(0.3, 0.0, 0.0);
+  this->driveController = frc::PIDController(kDriveP, 0.0, 0.0);
+  this->steerController = frc::PIDController(kSteerP, 0.0, 0.0);
 
   this->steerController.EnableContinuousInput(-M_PI, M_PI);
 }
@@ -72,12 +79,6 @@ void NeoKrakenModule::ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX& target
 
   config.MotorOutput.NeutralMode = ctre::phoenix6::signals::NeutralModeValue::Brake;
 
-  config.CurrentLimits.StatorCurrentLimit = 70_A;
-  config.CurrentLimits.SupplyCurrentLimit = 50_A;
-
-  config.CurrentLimits.SupplyCurrentLimitEnable = true;
-  config.CurrentLimits.StatorCurrentLimitEnable = true;
-
   CurrentLimitsDrive(config);
 
   target.GetConfigurator().Apply(config);
@@ -86,7 +87,7 @@ void NeoKrakenModule::ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX& target
 void NeoKrakenModule::ConfigSteerMotor(rev::spark::SparkMax& target) {
   rev::spark::SparkBaseConfig config;
   config.Inverted(false);
-  config.VoltageCompensation(12.8);
+  config.VoltageCompensation(12);
   config.SetIdleMode(rev::spark::SparkBaseConfig::kBrake);
   config.SmartCurrentLimit(80);
   target.Configure(config, rev::ResetMode::kNoResetSafeParameters, rev::PersistMode::kPersistParameters);
@@ -97,8 +98,8 @@ void NeoKrakenModule::CurrentLimitsDrive(ctre::phoenix6::configs::TalonFXConfigu
   config.CurrentLimits.SupplyCurrentLimitEnable = true;
   config.CurrentLimits.StatorCurrentLimitEnable = true;
 
-  config.CurrentLimits.SupplyCurrentLimit = units::ampere_t{70};
-  config.CurrentLimits.StatorCurrentLimit = units::ampere_t{120};
+  config.CurrentLimits.SupplyCurrentLimit = 50_A;
+  config.CurrentLimits.StatorCurrentLimit = 70_A;
 }
 
 void NeoKrakenModule::SetModuleState(frc::SwerveModuleState state) {
@@ -121,6 +122,7 @@ void NeoKrakenModule::SetModuleState(frc::SwerveModuleState state) {
 
 double NeoKrakenModule::GetEncoderPosition() {
   const ctre::phoenix6::StatusSignal<units::turn_t> angle = encoderObject.GetAbsolutePosition();
+
   const double rawValue = angle.GetValueAsDouble();
   const double rawRadians = rawValue * kCanCoderMultiplier;
 
