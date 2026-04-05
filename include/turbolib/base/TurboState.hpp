@@ -13,7 +13,7 @@ class TurboState {
 
   void Set(const StateType& newState) {
     if (onExit) {
-      onExit(newState);
+      onExit(currentState);
     }
 
     currentState = newState;
