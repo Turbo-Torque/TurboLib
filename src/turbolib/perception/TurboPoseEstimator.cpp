@@ -62,14 +62,6 @@ void TurboPoseEstimator::UpdateAllSims(frc::Pose2d pose) {
 }
 
 bool TurboPoseEstimator::SeesTag() const {
-  bool seesTag = false;
-
-  for (const auto& camera : localizationCameras) {
-    if (camera->SeesTag()) {
-      seesTag = true;
-      break;
-    }
-  }
-
-  return seesTag;
+  return std::any_of(localizationCameras.begin(), localizationCameras.end(),
+                     [](const std::unique_ptr<TurboPhotonCamera>& cam) { return cam->SeesTag(); });
 }
