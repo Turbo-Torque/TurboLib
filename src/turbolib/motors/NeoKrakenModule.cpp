@@ -21,6 +21,7 @@
 #include <ctre/phoenix6/controls/VoltageOut.hpp>
 #include <ctre/phoenix6/core/CoreCANcoder.hpp>
 
+#include "ctre/phoenix6/TalonFX.hpp"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/current.h"
@@ -149,4 +150,8 @@ units::meters_per_second_t NeoKrakenModule::GetVelocity() {
 
 units::ampere_t NeoKrakenModule::GetCurrentDraw() {
   return driveMotor.GetTorqueCurrent().GetValue();
+}
+
+ctre::phoenix6::hardware::TalonFX& NeoKrakenModule::GetDriveMotor() {
+  return driveMotor;
 }

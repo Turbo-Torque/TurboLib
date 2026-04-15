@@ -72,5 +72,7 @@ class NeoKrakenModule final {
 
   /// Returns the current draw of the drive motor in amperes.
   units::ampere_t GetCurrentDraw();
+
+  ctre::phoenix6::hardware::TalonFX& GetDriveMotor();
 };
 }  // namespace turbolib::motors
