@@ -15,6 +15,7 @@
 #include "frc/geometry/Rotation2d.h"
 #include "photon/PhotonCamera.h"
 #include "photon/PhotonPoseEstimator.h"
+#include "photon/targeting/PhotonTrackedTarget.h"
 #include "turbolib/structure/PoseTimestampPair.hpp"
 
 using namespace turbolib::perception;
@@ -67,10 +68,14 @@ std::vector<turbolib::structure::PoseTimestampPair> TurboPhotonCamera::FetchPose
   for (const auto& result : camera.GetAllUnreadResults()) {
     lastResult = result;
 
+    photon::PhotonTrackedTarget target = result.GetBestTarget();
+
+    if (target.GetPoseAmbiguity() > 0.2) {
+      continue;
+    }
+
     if (auto visionEst = poseEstimator.EstimateCoprocMultiTagPose(result)) {
       poses.emplace_back(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp);
-    } else if (auto visionEstSingle = poseEstimator.EstimateLowestAmbiguityPose(result)) {
-      poses.emplace_back(visionEstSingle->estimatedPose.ToPose2d(), visionEstSingle->timestamp);
     }
   }
 

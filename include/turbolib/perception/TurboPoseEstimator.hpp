@@ -25,6 +25,7 @@ class TurboPoseEstimator {
   std::vector<std::unique_ptr<turbolib::perception::TurboPhotonCamera>> localizationCameras;
 
   bool visionEnabled = true;
+  bool photonVisionActive = true;
 
  public:
   TurboPoseEstimator(const frc::Rotation2d& gyroAngle, const std::array<frc::SwerveModulePosition, 4>& modulePositions,
