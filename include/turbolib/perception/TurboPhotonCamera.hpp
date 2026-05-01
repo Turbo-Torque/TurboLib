@@ -22,7 +22,7 @@
 
 namespace turbolib::perception {
 class TurboPhotonCamera {
- private:
+private:
   frc::AprilTagFieldLayout layout;
   photon::PhotonCamera camera;
   photon::PhotonPoseEstimator poseEstimator;
@@ -35,18 +35,22 @@ class TurboPhotonCamera {
 
   bool seesTag = false;
 
- public:
-  TurboPhotonCamera(const std::string& cameraName, const frc::Transform3d& cameraInBotSpace, frc::AprilTagField field,
+public:
+  TurboPhotonCamera(const std::string &cameraName,
+                    const frc::Transform3d &cameraInBotSpace,
+                    frc::AprilTagField field,
                     bool enableSim = frc::RobotBase::IsSimulation());
 
-  void UpdateSim(const frc::Pose2d& robotPose);
-  void UpdateHeading(const frc::Rotation2d& gyroAngle);
-  void ResetHeading(const frc::Rotation2d& gyroAngle);
+  void UpdateSim(const frc::Pose2d &robotPose);
+  void UpdateHeading(const frc::Rotation2d &gyroAngle);
+  void ResetHeading(const frc::Rotation2d &gyroAngle);
 
   std::vector<structure::PoseTimestampPair> FetchPose();
-  std::optional<photon::PhotonPipelineResult> GetLastResult() const { return lastResult; }
+  std::optional<photon::PhotonPipelineResult> GetLastResult() const {
+    return lastResult;
+  }
 
   bool SeesTag() const { return seesTag; }
   bool IsSimulated() const { return cameraSim.has_value(); }
 };
-}  // namespace turbolib::perception
+} // namespace turbolib::perception

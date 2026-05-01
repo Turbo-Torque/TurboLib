@@ -5,15 +5,15 @@
 
 #include <string>
 
-#include <frc/controller/PIDController.h>
-#include <frc/controller/SimpleMotorFeedforward.h>
 #include "frc/kinematics/SwerveModulePosition.h"
 #include "frc/kinematics/SwerveModuleState.h"
+#include <frc/controller/PIDController.h>
+#include <frc/controller/SimpleMotorFeedforward.h>
 
-#include <rev/SparkMax.h>
+#include "ctre/phoenix6/CANBus.hpp"
 #include <ctre/phoenix6/CANcoder.hpp>
 #include <ctre/phoenix6/TalonFX.hpp>
-#include "ctre/phoenix6/CANBus.hpp"
+#include <rev/SparkMax.h>
 
 #include "units/current.h"
 #include "units/length.h"
@@ -36,17 +36,21 @@ class NeoKrakenModule final {
   frc::SimpleMotorFeedforward<units::meters> ff;
   frc::PIDController driveController, steerController;
 
-  constexpr static double kVelocityMultiplier = (1 / GEAR_RATIO / 60) * (units::meter_t{WHEEL_DIAMETER}.value() * M_PI);
-  constexpr static double kPositionMultiplier = (1 / GEAR_RATIO) * (units::meter_t{WHEEL_DIAMETER}.value() * M_PI);
+  constexpr static double kVelocityMultiplier =
+      (1 / GEAR_RATIO / 60) * (units::meter_t{WHEEL_DIAMETER}.value() * M_PI);
+  constexpr static double kPositionMultiplier =
+      (1 / GEAR_RATIO) * (units::meter_t{WHEEL_DIAMETER}.value() * M_PI);
   constexpr static double kCanCoderMultiplier = 2 * M_PI;
 
-  void ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX& target);
-  void ConfigSteerMotor(rev::spark::SparkMax& target);
-  void SetupEncoder(ctre::phoenix6::hardware::CANcoder& encoder);
-  void CurrentLimitsDrive(ctre::phoenix6::configs::TalonFXConfiguration& config);
+  void ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX &target);
+  void ConfigSteerMotor(rev::spark::SparkMax &target);
+  void SetupEncoder(ctre::phoenix6::hardware::CANcoder &encoder);
+  void
+  CurrentLimitsDrive(ctre::phoenix6::configs::TalonFXConfiguration &config);
 
- public:
-  NeoKrakenModule(const std::string& name, int driveID, int steerID, int encoderID, const std::string& can = "");
+public:
+  NeoKrakenModule(const std::string &name, int driveID, int steerID,
+                  int encoderID, const std::string &can = "");
   ~NeoKrakenModule() = default;
 
   /// Configures the feedforward and PID values for the drive and steer motors.
@@ -61,7 +65,8 @@ class NeoKrakenModule final {
   /// Returns the position of the module in meters.
   double GetPosition();
 
-  /// Returns the state of the module, including velocity in meters per second and angle in radians.
+  /// Returns the state of the module, including velocity in meters per second
+  /// and angle in radians.
   frc::SwerveModuleState GetModuleState();
 
   /// Returns the position of the module in meters and radians, respectively.
@@ -73,6 +78,6 @@ class NeoKrakenModule final {
   /// Returns the current draw of the drive motor in amperes.
   units::ampere_t GetCurrentDraw();
 
-  ctre::phoenix6::hardware::TalonFX& GetDriveMotor();
+  ctre::phoenix6::hardware::TalonFX &GetDriveMotor();
 };
-}  // namespace turbolib::motors
+} // namespace turbolib::motors
