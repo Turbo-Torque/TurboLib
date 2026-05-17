@@ -63,12 +63,14 @@ void TurboPhotonCamera::ResetHeading(const frc::Rotation2d& gyroAngle) {
 }
 
 std::vector<turbolib::structure::PoseTimestampPair> TurboPhotonCamera::FetchPose() {
+  const auto& results = camera.GetAllUnreadResults();
   std::vector<turbolib::structure::PoseTimestampPair> poses;
+  poses.reserve(results.size());
 
-  for (const auto& result : camera.GetAllUnreadResults()) {
+  for (const auto& result : results) {
     lastResult = result;
 
-    photon::PhotonTrackedTarget target = result.GetBestTarget();
+    const auto target = result.GetBestTarget();
 
     if (target.GetPoseAmbiguity() > 0.2) {
       continue;
@@ -83,7 +85,6 @@ std::vector<turbolib::structure::PoseTimestampPair> TurboPhotonCamera::FetchPose
     seesTag = false;
   } else {
     seesTag = true;
-
     visionPosePublisher.Set(poses.front().getPose());
   }
 
