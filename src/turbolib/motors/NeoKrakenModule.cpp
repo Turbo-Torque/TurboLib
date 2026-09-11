@@ -80,6 +80,12 @@ void NeoKrakenModule::ConfigDriveMotor(ctre::phoenix6::hardware::TalonFX& target
 
   config.MotorOutput.NeutralMode = ctre::phoenix6::signals::NeutralModeValue::Brake;
 
+  // FIXED (by request): force this to a known value instead of leaving whatever was previously
+  // persisted on the device (via Refresh() above) — kPositionMultiplier/kVelocityMultiplier in
+  // NeoKrakenModule.hpp already divide by GEAR_RATIO in software, so if the device itself also
+  // had a gear ratio baked into SensorToMechanismRatio, position/velocity would be divided twice.
+  config.Feedback.SensorToMechanismRatio = 1.0;
+
   CurrentLimitsDrive(config);
 
   target.GetConfigurator().Apply(config);
