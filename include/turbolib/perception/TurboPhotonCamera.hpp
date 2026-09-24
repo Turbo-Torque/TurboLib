@@ -16,6 +16,7 @@
 #include "photon/PhotonPoseEstimator.h"
 #include "photon/simulation/PhotonCameraSim.h"
 #include "photon/simulation/VisionSystemSim.h"
+#include "photon/targeting/PhotonPipelineResult.h"
 #include "turbolib/structure/PoseTimestampPair.hpp"
 
 namespace turbolib::perception {
@@ -39,6 +40,39 @@ class TurboPhotonCamera {
   void ResetHeading(const frc::Rotation2d& gyroAngle);
 
   std::vector<structure::PoseTimestampPair> FetchPose();
+  structure::PoseTimestampPair CalculateStdDevs(const photon::EstimatedRobotPose& estimatedPose,
+                                                const photon::PhotonPipelineResult& result) {
+    int numTags = estimatedPose.targetsUsed.size();
+    double avgDistance = 0.0;
+
+    for (const auto& target : estimatedPose.targetsUsed) {
+      avgDistance += target.GetBestCameraToTarget().Translation().Norm().value();
+    }
+
+    if (numTags > 0)
+      avgDistance /= numTags;
+
+    double xyStdDev = 0.1;
+    double degStdDev = 0.05;
+
+    if (numTags == 1) {
+      // Singletag scales quadratically with distance
+      xyStdDev = 0.05 * std::pow(avgDistance, 2.0);
+      degStdDev = 0.1 * std::pow(avgDistance, 2.0);
+    } else {
+      // Multitag scales linearly and drops with more tags
+      xyStdDev = (0.02 * avgDistance) / numTags;
+      degStdDev = (0.03 * avgDistance) / numTags;
+    }
+
+    // if more than 4.5 meters away, basically ignore
+    if (avgDistance > 4.5) {
+      xyStdDev = 999.0;
+      degStdDev = 999.0;
+    }
+
+    return {estimatedPose.estimatedPose.ToPose2d(), estimatedPose.timestamp, {xyStdDev, xyStdDev, degStdDev}};
+  }
 
   bool SeesTag() const { return seesTag; }
   bool IsSimulated() const { return cameraSim.has_value(); }

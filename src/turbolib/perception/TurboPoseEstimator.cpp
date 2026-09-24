@@ -37,10 +37,10 @@ void TurboPoseEstimator::UpdateWithOdometryAndVision(const frc::Rotation2d& gyro
 
 void TurboPoseEstimator::TryVisionUpdateWithCamera(turbolib::perception::TurboPhotonCamera& camera,
                                                    const frc::Rotation2d& gyroAngle) {
-  const std::vector<turbolib::structure::PoseTimestampPair> visionPoses = camera.FetchPose();
+  const auto visionPoses = camera.FetchPose();
 
   for (const auto& pair : visionPoses) {
-    poseEstimator.AddVisionMeasurement(pair.getPose(), pair.getLatency());
+    poseEstimator.AddVisionMeasurement(pair.getPose(), pair.getLatency(), pair.getStdDevs());
   }
 }
 

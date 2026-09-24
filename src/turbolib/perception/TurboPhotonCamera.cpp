@@ -65,22 +65,24 @@ std::vector<turbolib::structure::PoseTimestampPair> TurboPhotonCamera::FetchPose
   poses.reserve(results.size());
 
   for (const auto& result : results) {
-    const auto target = result.GetBestTarget();
-
-    if (target.GetPoseAmbiguity() > 0.2) {
+    if (!result.HasTargets())
       continue;
+
+    auto visionEst = poseEstimator.EstimateCoprocMultiTagPose(result);
+
+    if (!visionEst.has_value()) {
+      visionEst = poseEstimator.EstimateLowestAmbiguityPose(result);
+      if (visionEst.has_value() && result.GetBestTarget().GetPoseAmbiguity() > 0.15) {
+        continue;
+      }
     }
 
-    if (auto visionEst = poseEstimator.EstimateCoprocMultiTagPose(result)) {
-      poses.emplace_back(visionEst->estimatedPose.ToPose2d(), visionEst->timestamp);
+    if (visionEst.has_value()) {
+      poses.push_back(CalculateStdDevs(visionEst.value(), result));
     }
   }
 
-  if (poses.empty()) {
-    seesTag = false;
-  } else {
-    seesTag = true;
-  }
+  seesTag = !poses.empty();
 
   return poses;
 }
