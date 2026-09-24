@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <array>
 #include <memory>
-#include <optional>
 #include <string>
 #include <vector>
 
@@ -49,14 +48,6 @@ class TurboPoseEstimator {
                              frc::AprilTagField field, bool enableSim = false) {
     localizationCameras.push_back(
         std::make_unique<turbolib::perception::TurboPhotonCamera>(cameraName, cameraInBotSpace, field, enableSim));
-  }
-
-  std::optional<photon::PhotonPipelineResult> GetLastVisionResult(int cameraIdx) const {
-    if (cameraIdx < 0 || static_cast<size_t>(cameraIdx) >= localizationCameras.size()) {
-      return std::nullopt;
-    }
-
-    return localizationCameras[cameraIdx]->GetLastResult();
   }
 
   bool SeesTag() const;

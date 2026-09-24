@@ -23,9 +23,6 @@ using namespace turbolib::perception;
 TurboPhotonCamera::TurboPhotonCamera(const std::string& cameraName, const frc::Transform3d& cameraInBotSpace,
                                      frc::AprilTagField field, bool enableSim)
     : layout(frc::AprilTagFieldLayout::LoadField(field)), camera(cameraName), poseEstimator(layout, cameraInBotSpace) {
-  visionPosePublisher =
-      nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("DriveSubsystem/VisionPose").Publish();
-
   if (enableSim) {
     auto cameraProp = photon::SimCameraProperties();
     cameraProp.SetCalibration(640, 480, 75_deg);
@@ -68,8 +65,6 @@ std::vector<turbolib::structure::PoseTimestampPair> TurboPhotonCamera::FetchPose
   poses.reserve(results.size());
 
   for (const auto& result : results) {
-    lastResult = result;
-
     const auto target = result.GetBestTarget();
 
     if (target.GetPoseAmbiguity() > 0.2) {
@@ -85,7 +80,6 @@ std::vector<turbolib::structure::PoseTimestampPair> TurboPhotonCamera::FetchPose
     seesTag = false;
   } else {
     seesTag = true;
-    visionPosePublisher.Set(poses.front().getPose());
   }
 
   return poses;
