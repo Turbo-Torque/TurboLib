@@ -6,9 +6,9 @@
 #include <cassert>
 #include <vector>
 
-#include "frc/DataLogManager.h"
 #include "frc/geometry/Pose2d.h"
 #include "turbolib/structure/PoseTimestampPair.hpp"
+
 
 using namespace turbolib::perception;
 
@@ -45,15 +45,22 @@ void TurboPoseEstimator::TryVisionUpdateWithCamera(turbolib::perception::TurboPh
 }
 
 void TurboPoseEstimator::UpdateWithAllAvailableVisionMeasurements(const frc::Rotation2d& gyroAngle) {
-  if (localizationCameras.empty()) {
-    frc::DataLogManager::Log("No localization cameras configured for pose estimation!");
-    return;
-  }
-
+  // FIXED: this used to return early (skipping the limelightCameras loop below entirely) whenever
+  // localizationCameras was empty — true whenever PhotonVision cameras are disabled/commented out,
+  // even with Limelight cameras configured and working. Looping over an empty vector is already a
+  // no-op, so the guard wasn't needed in the first place.
   for (auto& camera : localizationCameras) {
     TryVisionUpdateWithCamera(*camera, gyroAngle);
   }
+
+  for (auto& camera : limelightCameras) {
+    for (const auto& pair : camera->FetchPose()) {
+      poseEstimator.AddVisionMeasurement(pair.getPose(), pair.getLatency());
+    }
+  }
 }
+
+
 
 void TurboPoseEstimator::UpdateAllSims(frc::Pose2d pose) {
   for (auto& camera : localizationCameras) {

@@ -16,6 +16,8 @@
 #include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/SwerveModulePosition.h"
 #include "turbolib/perception/TurboPhotonCamera.hpp"
+#include "turbolib/perception/TurboLimelightCamera.hpp"
+
 
 namespace turbolib::perception {
 class TurboPoseEstimator {
@@ -23,6 +25,7 @@ class TurboPoseEstimator {
   frc::SwerveDrivePoseEstimator<4> poseEstimator;
 
   std::vector<std::unique_ptr<turbolib::perception::TurboPhotonCamera>> localizationCameras;
+  std::vector<std::unique_ptr<turbolib::perception::TurboLimelightCamera>> limelightCameras;
 
   bool visionEnabled = true;
   bool photonVisionActive = true;
@@ -50,6 +53,12 @@ class TurboPoseEstimator {
     localizationCameras.push_back(
         std::make_unique<turbolib::perception::TurboPhotonCamera>(cameraName, cameraInBotSpace, field, enableSim));
   }
+
+  void AddLimelightCamera(const std::string& limelightName, const frc::Transform3d& cameraInBotSpace) {
+    limelightCameras.push_back(
+        std::make_unique<turbolib::perception::TurboLimelightCamera>(limelightName, cameraInBotSpace));
+}
+
 
   std::optional<photon::PhotonPipelineResult> GetLastVisionResult(int cameraIdx) const {
     if (cameraIdx < 0 || static_cast<size_t>(cameraIdx) >= localizationCameras.size()) {

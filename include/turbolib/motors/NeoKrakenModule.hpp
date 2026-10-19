@@ -37,7 +37,7 @@ class NeoKrakenModule final {
   frc::PIDController driveController, steerController;
 
   constexpr static double kVelocityMultiplier =
-      (1 / GEAR_RATIO / 60) * (units::meter_t{WHEEL_DIAMETER}.value() * M_PI);
+      (1 / GEAR_RATIO) * (units::meter_t{WHEEL_DIAMETER}.value() * M_PI);
   constexpr static double kPositionMultiplier =
       (1 / GEAR_RATIO) * (units::meter_t{WHEEL_DIAMETER}.value() * M_PI);
   constexpr static double kCanCoderMultiplier = 2 * M_PI;
