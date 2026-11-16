@@ -17,12 +17,6 @@ TurboLimelightCamera::TurboLimelightCamera(const std::string& limelightName, con
     botposeSubscriber = table->GetDoubleArrayTopic("botpose_wpiblue").Subscribe({});
     targetValidSubscriber = table->GetDoubleTopic("tv").Subscribe(0.0);
     cameraPosePublisher = table->GetDoubleArrayTopic("camerapose_robotspace_set").Publish();
-
-    // ADDED: tells the Limelight where it's physically mounted on the robot (forward/side/up in
-    // meters, roll/pitch/yaw in degrees — same axis convention Transform3d already uses, no
-    // conversion needed) so botpose_wpiblue computes the ROBOT's pose, not just the camera's.
-    // Set once here since the mount is physically fixed; per Limelight's docs this overrides
-    // whatever's set in its web UI, which should be zeroed out to avoid ambiguity about which wins.
     const frc::Translation3d& t = cameraInBotSpace.Translation();
     const frc::Rotation3d& r = cameraInBotSpace.Rotation();
     std::vector<double> robotSpacePose = {
@@ -30,6 +24,7 @@ TurboLimelightCamera::TurboLimelightCamera(const std::string& limelightName, con
         units::degree_t{r.X()}.value(), units::degree_t{r.Y()}.value(), units::degree_t{r.Z()}.value()
     };
     cameraPosePublisher.Set(robotSpacePose);
+    SetCameraInBotSpace(cameraInBotSpace);
 }
 
 std::vector<turbolib::structure::PoseTimestampPair> TurboLimelightCamera::FetchPose() {

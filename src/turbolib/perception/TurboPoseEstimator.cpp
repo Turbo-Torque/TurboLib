@@ -45,10 +45,7 @@ void TurboPoseEstimator::TryVisionUpdateWithCamera(turbolib::perception::TurboPh
 }
 
 void TurboPoseEstimator::UpdateWithAllAvailableVisionMeasurements(const frc::Rotation2d& gyroAngle) {
-  // FIXED: this used to return early (skipping the limelightCameras loop below entirely) whenever
-  // localizationCameras was empty — true whenever PhotonVision cameras are disabled/commented out,
-  // even with Limelight cameras configured and working. Looping over an empty vector is already a
-  // no-op, so the guard wasn't needed in the first place.
+
   for (auto& camera : localizationCameras) {
     TryVisionUpdateWithCamera(*camera, gyroAngle);
   }
@@ -59,8 +56,6 @@ void TurboPoseEstimator::UpdateWithAllAvailableVisionMeasurements(const frc::Rot
     }
   }
 }
-
-
 
 void TurboPoseEstimator::UpdateAllSims(frc::Pose2d pose) {
   for (auto& camera : localizationCameras) {

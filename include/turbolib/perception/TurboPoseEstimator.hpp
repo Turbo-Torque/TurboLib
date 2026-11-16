@@ -57,7 +57,13 @@ class TurboPoseEstimator {
   void AddLimelightCamera(const std::string& limelightName, const frc::Transform3d& cameraInBotSpace) {
     limelightCameras.push_back(
         std::make_unique<turbolib::perception::TurboLimelightCamera>(limelightName, cameraInBotSpace));
-}
+  }
+
+  void SetLimelightCameraNewSettings(int cameraIdx, const frc::Transform3d& cameraInBotSpace) {
+    if (cameraIdx >= 0 && static_cast<size_t>(cameraIdx) < limelightCameras.size()) {
+      limelightCameras[cameraIdx]->SetCameraInBotSpace(cameraInBotSpace);
+    }
+  }
 
 
   std::optional<photon::PhotonPipelineResult> GetLastVisionResult(int cameraIdx) const {
